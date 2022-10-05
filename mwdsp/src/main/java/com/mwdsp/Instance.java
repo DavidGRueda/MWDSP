@@ -1,0 +1,157 @@
+package com.mwdsp;
+
+import java.io.*;
+import java.util.ArrayList;
+
+public class Instance {
+
+    // Variables
+    private int noNodes;
+    private int noEdges;
+    private int[] weights;
+    private int[][] adjMatrix;
+    private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>();
+
+    // Constructor & Methods
+    public Instance(String filename) {
+
+        String extension = filename.substring(filename.length() - 3);
+
+        try {
+            String file = "mwdsp/data/" + filename;
+            BufferedReader br = new BufferedReader(new FileReader(file));
+
+            switch (extension) {
+                case "clq":
+                    parseCLQFile(br);
+                    break;
+                case "mtx":
+                    parseMTXFile(br);
+                    break;
+                default:
+                    System.err.println("File extension not supported");
+            }
+
+        } catch (Exception e) {
+            System.out.println("File not found");
+        }
+    }
+
+    public void printInstance() {
+        // Print number of nodes and number of edges
+        System.out.println("\nNumber of nodes: " + noNodes + "\nNumber of edges: " + noEdges);
+
+        // Print node weights
+        System.out.print("\nWeights: \n[");
+        for (int i = 0; i < weights.length - 1; i++) {
+            System.out.print(weights[i] + ", ");
+        }
+        System.out.println(weights[weights.length - 1] + "]");
+
+        // Print adjacency matrix
+        System.out.println("\nAdjacency matrix");
+        for (int i = 0; i < adjMatrix.length; i++) {
+            for (int j = 0; j < adjMatrix.length; j++) {
+                System.out.print(adjMatrix[i][j]);
+            }
+            System.out.println();
+        }
+
+        // Print adjacency list
+        System.out.println("\nAdjacency List");
+        int auxCont = 1; // To know index in the arrayList.
+        for (ArrayList<Integer> arr : adjList) {
+            System.out.print(auxCont + " -> ");
+            for (Integer integer : arr) {
+                System.out.print((integer + 1) + " ");
+            }
+            System.out.println();
+            auxCont++;
+        }
+    }
+
+    private void parseCLQFile(BufferedReader br) {
+        String line;
+        String[] arr;
+
+        try {
+            while ((line = br.readLine()) != null) {
+                String line_id = Character.toString(line.charAt(0));
+
+                if (line_id.equals("c")) // Continue loop if line is a comment.
+                    continue;
+
+                arr = line.split(" ");
+
+                int x, y;
+                switch (line_id) {
+                    case "p":
+                        noNodes = Integer.parseInt(arr[2]);
+                        noEdges = Integer.parseInt(arr[3]);
+                        adjMatrix = new int[noNodes][noNodes];
+                        initializeWeights(noNodes);
+                        initializeAdjList(noNodes);
+                        break;
+                    case "e":
+                        x = Integer.parseInt(arr[1]) - 1; // Nodes are numbered from [1, noNodes]
+                        y = Integer.parseInt(arr[2]) - 1;
+                        addEdge(x, y);
+                        break;
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e);
+        }
+    }
+
+    private void parseMTXFile(BufferedReader br) {
+        String line;
+        String[] arr;
+
+        try {
+            line = br.readLine(); // First line commentary
+            line = br.readLine(); // Second line -> Nodes and edges.
+
+            arr = line.split(" ");
+            noNodes = Integer.parseInt(arr[1]);
+            noEdges = Integer.parseInt(arr[2]);
+            adjMatrix = new int[noNodes][noNodes];
+            initializeWeights(noNodes);
+            initializeAdjList(noNodes);
+
+            int x, y;
+            for (int i = 0; i < noEdges; i++) {
+                arr = br.readLine().split(" ");
+                x = Integer.parseInt(arr[0]) - 1; // Nodes are numbered from [1, noNodes]
+                y = Integer.parseInt(arr[1]) - 1;
+                addEdge(x, y);
+            }
+            br.close();
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e);
+        }
+    }
+
+    private void initializeWeights(int noNodes) {
+        weights = new int[noNodes];
+
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = (i % 200) + 1;
+        }
+    }
+
+    private void initializeAdjList(int noNodes) {
+        for (int i = 0; i < noNodes; i++) {
+            ArrayList<Integer> aux = new ArrayList<Integer>();
+            this.adjList.add(aux);
+        }
+    }
+
+    private void addEdge(int x, int y) {
+        adjMatrix[x][y] = 1;
+        adjMatrix[y][x] = 1;
+        adjList.get(x).add(y);
+        adjList.get(y).add(x);
+    }
+}

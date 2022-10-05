@@ -1,0 +1,17 @@
+04 Octubre
+    - Creación del repositorio y del proyecto base. 
+    - Descarga del subconjunto de problemas. Almacenamiento en /data
+    - Creación de la clase Instance. 
+        - Array de pesos con la fórmula w(i) = (i mod 200) + 1. 
+        - Número de nodos y de aristas. 
+        - Matriz de adyacencia. 
+        - Se realiza el parser para archivos .clq -> Ahora con un bucle while y un if.
+          Opción de ser modificado para ignorar los primeros comentarios y empezar a contar a partir que se encuentra "p", 
+          haciendo uso del número de aristas para cerrar el fichero. Preguntar a Jesús, aunque no es algo crítico. 
+        - Se baraja el uso de un ArrayList para la lista de adyacencia. Mejor que una LinkedList ya que, para el acceso a un determinado índice,
+          tiene una complejidad O(1), aunque la creación sea más costosa (creación no cuenta en tiempo). 
+05 Octubre
+    - Se termina de desarrollar la lista de adyacecncia con ArrayList. Se comprueba el funcionamiento correcto. 
+    - Se construye el parser para archivos .mtx. Se realiza una comprobación de los últimos 3 caracteres del "filename" en la creación
+      de la Instancia. 
+    - Código encapsulado en varios submétodos fácilmente modificables para evitar código duplicado.
