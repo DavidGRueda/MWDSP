@@ -37,6 +37,18 @@ public class Instance {
         }
     }
 
+    public int getNodes() {
+        return this.noNodes;
+    }
+
+    public int getWeight(int node) {
+        return weights[node];
+    }
+
+    public ArrayList<Integer> getConnectionList(int node) {
+        return adjList.get(node);
+    }
+
     public void printInstance() {
         // Print number of nodes and number of edges
         System.out.println("\nNumber of nodes: " + noNodes + "\nNumber of edges: " + noEdges);

@@ -15,3 +15,10 @@
     - Se construye el parser para archivos .mtx. Se realiza una comprobación de los últimos 3 caracteres del "filename" en la creación
       de la Instancia. 
     - Código encapsulado en varios submétodos fácilmente modificables para evitar código duplicado.
+    - Creación de la clase "Solution".
+        - Se añaden tanto arrays que contienen todos los datos de forma concreta como una forma optimizada. P.e:
+          Para el peso, se tiene un array de los nodos seleccionados y de los pesos (para no tener que acceder a la instancia una y otra vez al
+          añadir un nodo concreto), pero también un "totalWeight".
+          Para los nodos dominados, en vez de recorrer el array para saber si todos son 1, tener una variable "numDomNodes" 
+        - Al añadir un nodo, se deben de marcar aquellos nodos que se dominan al seleccionarlo y añadir el peso.
+    - Creación de la clase "RandomBuilder" -> Selecciona nodos aleatorios siempre y los añade a la solución hasta que todos estén dominados. 
