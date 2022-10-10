@@ -1,7 +1,6 @@
 package com.mwdsp;
 
 import java.util.Random;
-import com.mwdsp.*;
 
 public class RandomBuilder implements Builder {
 
@@ -14,11 +13,12 @@ public class RandomBuilder implements Builder {
 
         int totalNodes = i.getNodes();
 
-        // Add nodes to the solution until it's factible.
+        // Add nodes (not selected before) to the solution until it's factible.
         int randomNode;
         while (!sol.isFeasible()) {
             randomNode = random.nextInt(totalNodes);
-            sol.add(randomNode);
+            if (!sol.isSelected(randomNode))
+                sol.add(randomNode);
         }
 
         return sol;

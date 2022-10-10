@@ -46,6 +46,10 @@ public class Solution {
         return domNodes[node] == 1;
     }
 
+    public Boolean isSelected(int node) {
+        return selectedNodes[node] == 1;
+    }
+
     public int getTotalWeight() {
         return totalWeight;
     }
@@ -54,8 +58,16 @@ public class Solution {
         System.out.println("Total Weight: " + totalWeight);
         System.out.println("Selected nodes: ");
         for (int i = 0; i < selectedNodes.length; i++) {
-            if (selectedNodes[i] == 1)
+            if (selectedNodes[i] == 1) {
+                /*
+                 * System.out.print((i + 1) + " -> ");
+                 * for (int connection : instance.getConnectionList(i)) {
+                 * System.out.print(connection + " ");
+                 * }
+                 * System.out.println();
+                 */
                 System.out.print((i + 1) + " ");
+            }
         }
         System.out.println("\n");
     }
