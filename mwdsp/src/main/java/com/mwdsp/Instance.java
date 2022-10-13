@@ -29,7 +29,7 @@ public class Instance {
                     parseMTXFile(br);
                     break;
                 default:
-                    System.err.println("File extension not supported");
+                    parseDefault(br);
             }
 
         } catch (Exception e) {
@@ -61,13 +61,13 @@ public class Instance {
         System.out.println(weights[weights.length - 1] + "]");
 
         // Print adjacency matrix
-        System.out.println("\nAdjacency matrix");
-        for (int i = 0; i < adjMatrix.length; i++) {
-            for (int j = 0; j < adjMatrix.length; j++) {
-                System.out.print(adjMatrix[i][j]);
-            }
-            System.out.println();
-        }
+        // System.out.println("\nAdjacency matrix");
+        // for (int i = 0; i < adjMatrix.length; i++) {
+        // for (int j = 0; j < adjMatrix.length; j++) {
+        // System.out.print(adjMatrix[i][j]);
+        // }
+        // System.out.println();
+        // }
 
         // Print adjacency list
         System.out.println("\nAdjacency List");
@@ -142,6 +142,48 @@ public class Instance {
             br.close();
         } catch (IOException e) {
             System.err.println("Error reading file: " + e);
+        }
+    }
+
+    private void parseDefault(BufferedReader br) {
+        String line;
+
+        try {
+            line = br.readLine(); // First line 'NumberOfNodes:'
+            line = br.readLine();
+            noNodes = Integer.parseInt(line);
+            adjMatrix = new int[noNodes][noNodes];
+            initializeAdjList(noNodes);
+            // initializeWeights(noNodes); -> Initialize with file weights
+
+            line = br.readLine(); // Node positions (not used)
+            for (int i = 0; i < noNodes + 1; i++) {
+                line = br.readLine();
+            }
+
+            // Establish weights
+            weights = new int[noNodes];
+            for (int j = 0; j < noNodes; j++) {
+                weights[j] = Integer.parseInt(br.readLine());
+            }
+
+            line = br.readLine(); // Connections comment.
+            String[] connections;
+            noEdges = 0;
+            for (int i = 0; i < noNodes; i++) {
+                line = br.readLine();
+                connections = line.split(" ");
+
+                for (int j = 0; j < i; j++) {
+                    if (Integer.parseInt(connections[j]) == 1) {
+                        addEdge(i, j);
+                        noEdges++;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 

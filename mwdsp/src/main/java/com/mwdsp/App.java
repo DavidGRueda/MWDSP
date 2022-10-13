@@ -2,9 +2,10 @@ package com.mwdsp;
 
 public class App {
     public static void main(String[] args) {
-        int N_IT = 100;
+        int N_IT = 100000;
 
-        Instance i = new Instance("frb59-26-2.mtx");
+        Instance i = new Instance("Problem.dat_1000_1000_1");
+        i.printInstance();
         RandomBuilder r = new RandomBuilder();
         double bestWeight = Double.POSITIVE_INFINITY;
         double localWeight;

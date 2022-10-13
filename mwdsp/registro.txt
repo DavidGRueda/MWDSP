@@ -1,8 +1,8 @@
 04 Octubre
-    - Creación del repositorio y del proyecto base. 
+    - Creación del repositorio y del proyecto base. https://github.com/DavidGRueda/MWDSP
     - Descarga del subconjunto de problemas. Almacenamiento en /data
     - Creación de la clase Instance. 
-        - Array de pesos con la fórmula w(i) = (i mod 200) + 1. 
+        - Array de pesos con la fórmula w(i) = (i mod 200) + 1 (para DIMACS y BHOSLIB)
         - Número de nodos y de aristas. 
         - Matriz de adyacencia. 
         - Se realiza el parser para archivos .clq -> Ahora con un bucle while y un if.
@@ -22,3 +22,12 @@
           Para los nodos dominados, en vez de recorrer el array para saber si todos son 1, tener una variable "numDomNodes" 
         - Al añadir un nodo, se deben de marcar aquellos nodos que se dominan al seleccionarlo y añadir el peso.
     - Creación de la clase "RandomBuilder" -> Selecciona nodos aleatorios siempre y los añade a la solución hasta que todos estén dominados. 
+13 Octubre
+    - Se establece que los casos de uso de DIMACS y BHOSLIB son erróneos (no coinciden con los resultados del paper). Se establece un nuevo
+      subconjunto de problemas desde la carpeta T1. 
+    - Se crea un nuevo parser por defecto que tratará estas nuevas instancias del problema (se borran las anteriores pero no sus parsers). 
+    - Se crea nueva tabla de tiempos con el formato especificado en la tutoría para medir los tiempos más fácilmente. 
+      https://docs.google.com/spreadsheets/d/1qn7FTewv3bSMuiCleIF9dv8TshVnmj9Zua-MkyMlK2U/edit?usp=sharing
+    - Se rellenan los diferentes datos del algoritmo RandomBuilder. Como conclusión, se aprecia que los grafos con pocos nodos y con gran 
+      número de aristas son resueltos con gran eficiencia por el RandomBuilder, pero es pésimo con respecto al resto de grafos en el cálculo
+      de la f.o.
