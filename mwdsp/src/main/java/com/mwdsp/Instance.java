@@ -9,6 +9,7 @@ public class Instance {
     private int noNodes;
     private int noEdges;
     private int[] weights;
+    private int[] numConnections;
     private int[][] adjMatrix;
     private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>();
 
@@ -49,6 +50,10 @@ public class Instance {
         return adjList.get(node);
     }
 
+    public int[] getNumConnections() {
+        return numConnections;
+    }
+
     public void printInstance() {
         // Print number of nodes and number of edges
         System.out.println("\nNumber of nodes: " + noNodes + "\nNumber of edges: " + noEdges);
@@ -80,6 +85,13 @@ public class Instance {
             System.out.println();
             auxCont++;
         }
+
+        // Print num connections
+        System.out.print("\n Num of connections: \n[");
+        for (int i = 0; i < numConnections.length - 1; i++) {
+            System.out.print(numConnections[i] + ", ");
+        }
+        System.out.println(numConnections[numConnections.length - 1] + "]");
     }
 
     private void parseCLQFile(BufferedReader br) {
@@ -101,6 +113,7 @@ public class Instance {
                         noNodes = Integer.parseInt(arr[2]);
                         noEdges = Integer.parseInt(arr[3]);
                         adjMatrix = new int[noNodes][noNodes];
+                        numConnections = new int[noNodes];
                         initializeWeights(noNodes);
                         initializeAdjList(noNodes);
                         break;
@@ -129,6 +142,7 @@ public class Instance {
             noNodes = Integer.parseInt(arr[1]);
             noEdges = Integer.parseInt(arr[2]);
             adjMatrix = new int[noNodes][noNodes];
+            numConnections = new int[noNodes];
             initializeWeights(noNodes);
             initializeAdjList(noNodes);
 
@@ -153,6 +167,7 @@ public class Instance {
             line = br.readLine();
             noNodes = Integer.parseInt(line);
             adjMatrix = new int[noNodes][noNodes];
+            numConnections = new int[noNodes];
             initializeAdjList(noNodes);
             // initializeWeights(noNodes); -> Initialize with file weights
 
@@ -207,5 +222,7 @@ public class Instance {
         adjMatrix[y][x] = 1;
         adjList.get(x).add(y);
         adjList.get(y).add(x);
+        numConnections[x]++;
+        numConnections[y]++;
     }
 }

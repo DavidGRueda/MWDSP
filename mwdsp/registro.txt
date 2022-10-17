@@ -31,3 +31,14 @@
     - Se rellenan los diferentes datos del algoritmo RandomBuilder. Como conclusión, se aprecia que los grafos con pocos nodos y con gran 
       número de aristas son resueltos con gran eficiencia por el RandomBuilder, pero es pésimo con respecto al resto de grafos en el cálculo
       de la f.o.
+14 Octubre
+    - Se comienza el desarrollo de la clase GreedyBuilder -> Constructor con algoritmo voraz. 
+    - Para evitar que entre en tiempo la creación del array con el número de conexiones que tiene cada nodo, se genera dentro de la instancia (ya que
+      no entra en tiempo), evitando así un factor O(n). Se realiza un getter luego en la creación de la solución a partir de la instancia. 
+    - Al crear el nuevo constructor voraz, surgen algunas preguntas. Entre ellas:
+      - ¿Cómo realizar la actualización de la función objectivo del algoritmo voraz?
+      - ¿Cómo reducir la complejidad de la actualización de las conexiones?
+      - ¿Es óptimo recorrer bucle varias veces? -> ¿Se puede optimizar el cálculo del criterio voraz?
+    - Se crean el número de conexiones, pero deben de ser actualizadas cada vez que uno de los nodos se marque como dominado.
+    - Para que sea más rápido, en vez de actualizar las conexiones del nodo seleccionado (si no estaba dominado), se utiliza el bucle de actualización
+      de la dominación de sus vecinos para ahorrar un bucle (con una variable booleana). 

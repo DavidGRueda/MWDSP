@@ -11,6 +11,7 @@ public class Solution {
     private int numDomNodes;
     private int[] domNodes;
     private int[] selectedNodes;
+    private int[] numConnections; // Establish how many connections has each node to not dom. nodes.
 
     public Solution(Instance instance) {
         this.instance = instance;
@@ -19,23 +20,48 @@ public class Solution {
         numDomNodes = 0;
         domNodes = new int[totalNodes];
         selectedNodes = new int[totalNodes];
+        numConnections = instance.getNumConnections();
     }
 
     public void add(int node) {
+        boolean selectedNodeWasDominated = false;
+        ArrayList<Integer> connections = instance.getConnectionList(node); // Used to mark neighbours as dominated and
+                                                                           // update numConnections
+
         selectedNodes[node] = 1; // Add node to selected list.
         if (domNodes[node] == 0) {
             domNodes[node] = 1;
             numDomNodes++;
+            selectedNodeWasDominated = true;
+            numConnections[node]--;
         }
         totalWeight += instance.getWeight(node); // Add it's weight to the totalWeight.
+        updateNeighbours(connections, selectedNodeWasDominated);
+    }
 
-        ArrayList<Integer> connections = instance.getConnectionList(node); // Mark neighbours as dominated
-        for (Integer neighbour : connections) {
-            if (domNodes[neighbour] == 0) {
-                domNodes[neighbour] = 1;
-                numDomNodes++;
+    private void updateNeighbours(ArrayList<Integer> connections, boolean selectedNodeWasDominated) {
+        if (selectedNodeWasDominated) {
+            for (Integer neighbour : connections) {
+                numConnections[neighbour]--;
+                if (domNodes[neighbour] == 0) {
+                    domNodes[neighbour] = 1;
+                    numDomNodes++;
+                    updateNodeConnections(neighbour);
+                }
+            }
+        } else {
+            for (Integer neighbour : connections) {
+                if (domNodes[neighbour] == 0) {
+                    domNodes[neighbour] = 1;
+                    numDomNodes++;
+                    updateNodeConnections(neighbour);
+                }
             }
         }
+    }
+
+    public double calculateGreedyFactor(int node) {
+        return (double) (numConnections[node] + 1) / instance.getWeight(node);
     }
 
     public Boolean isFeasible() {
@@ -70,5 +96,13 @@ public class Solution {
             }
         }
         System.out.println("\n");
+    }
+
+    private void updateNodeConnections(int node) {
+        numConnections[node]--;
+        ArrayList<Integer> connections = instance.getConnectionList(node);
+        for (Integer neighbour : connections) {
+            numConnections[neighbour]--;
+        }
     }
 }
