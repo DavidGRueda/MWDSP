@@ -1,5 +1,7 @@
 package com.mwdsp;
 
+import java.util.Random;
+
 public class App {
     public static void main(String[] args) {
 
@@ -73,14 +75,56 @@ public class App {
     }
 
     public static void graspBuilderMethod(Instance i) {
-        GraspBuilder builder = new GraspBuilder(0.25);
-        Solution sol = null;
+        GraspBuilder builder;
+        Solution sol;
+        Solution bestSol = null;
+        double bestWeight = Double.POSITIVE_INFINITY;
+        double alpha;
+        double bestAlpha = -1;
+
+        Random random = new Random();
+        long seed = random.nextLong();
+        random.setSeed(seed);
 
         long start = System.currentTimeMillis();
-        sol = builder.execute(i);
+        for (int j = 0; j < 100; j++) {
+            alpha = random.nextDouble();
+            // Get new alpha while alpha == 0
+            while (alpha == 0.0)
+                alpha = random.nextDouble();
+
+            builder = new GraspBuilder(alpha);
+            sol = builder.execute(i);
+            if (sol.getTotalWeight() < bestWeight) {
+                bestSol = sol;
+                bestWeight = bestSol.getTotalWeight();
+                bestAlpha = alpha;
+            }
+        }
+        long finish = System.currentTimeMillis();
+
+        System.out.println("\nAlpha: " + bestAlpha);
+        System.out.println("\nTime: " + (finish - start) + " ms");
+        bestSol.printSolution();
+    }
+
+    public static void graspBuilderMethod(Instance i, double alpha) {
+        GraspBuilder builder = new GraspBuilder(alpha);
+        Solution sol = null;
+        Solution bestSol = null;
+        double bestWeight = Double.POSITIVE_INFINITY;
+
+        long start = System.currentTimeMillis();
+        for (int j = 0; j < 100; j++) {
+            sol = builder.execute(i);
+            if (sol.getTotalWeight() < bestWeight) {
+                bestSol = sol;
+                bestWeight = bestSol.getTotalWeight();
+            }
+        }
         long finish = System.currentTimeMillis();
 
         System.out.println("\nTime: " + (finish - start) + " ms");
-        sol.printSolution();
+        bestSol.printSolution();
     }
 }
