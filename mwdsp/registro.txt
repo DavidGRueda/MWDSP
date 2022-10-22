@@ -42,3 +42,11 @@
     - Se crean el número de conexiones, pero deben de ser actualizadas cada vez que uno de los nodos se marque como dominado.
     - Para que sea más rápido, en vez de actualizar las conexiones del nodo seleccionado (si no estaba dominado), se utiliza el bucle de actualización
       de la dominación de sus vecinos para ahorrar un bucle (con una variable booleana). 
+
+22 Octubre
+    - Construcción de la clase GraspBuilder -> Greedy Randomized Adaptative Search Procedure. 
+    - Complejidad actual del algoritmo -> O(2n), dos bucles for:
+      - Uno para calcular todas las funciones objetivo de cada uno de los nodos (si no están seleccionados)
+      - Otra para calcular los candidatos que pasan el filtro para luego seleccionar uno de ellos de forma aleatoria. 
+    - Se genera una solución por cada uno de los algoritmos, pero luego se modifica para realizar 100 soluciones y tomar la mejor de ellas. 
+    - Se itera 4 veces para comprobar resultados con valor alpha = 0.25, 0.5, 0.75 y aleatorio entre (0, 1) para cada iteración de las 100 soluciones. 
