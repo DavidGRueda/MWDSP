@@ -35,12 +35,12 @@ public class App {
         for (int i = 0; i < filenames.length; i++) {
             Instance ins = new Instance(filenames[i]);
             System.out.print(filenames[i]);
-            graspBuilderMethod(ins);
+            greedyBuilderMethod(ins, true);
         }
 
     }
 
-    public static void randomBuilderMethod(Instance i) {
+    public static void randomBuilderMethod(Instance i, boolean purge) {
         int N_IT = 100000;
 
         RandomBuilder r = new RandomBuilder();
@@ -51,6 +51,9 @@ public class App {
         long start = System.currentTimeMillis();
         for (int j = 0; j < N_IT; j++) {
             Solution sol = r.execute(i);
+            if(purge){
+                sol.purgeSolution();
+            }
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
                 bestSol = sol;
@@ -62,19 +65,22 @@ public class App {
         bestSol.printSolution();
     }
 
-    public static void greedyBuilderMethod(Instance i) {
+    public static void greedyBuilderMethod(Instance i, boolean purge) {
         GreedyBuilder builder = new GreedyBuilder();
         Solution sol = null;
 
         long start = System.currentTimeMillis();
         sol = builder.execute(i);
+        if(purge){
+            sol.purgeSolution();
+        }
         long finish = System.currentTimeMillis();
 
         System.out.println("\nTime: " + (finish - start) + " ms");
         sol.printSolution();
     }
 
-    public static void graspBuilderMethod(Instance i) {
+    public static void graspBuilderMethod(Instance i, boolean purge) {
         GraspBuilder builder;
         Solution sol;
         Solution bestSol = null;
@@ -95,6 +101,9 @@ public class App {
 
             builder = new GraspBuilder(alpha);
             sol = builder.execute(i);
+            if(purge){
+                sol.purgeSolution();
+            }
             if (sol.getTotalWeight() < bestWeight) {
                 bestSol = sol;
                 bestWeight = bestSol.getTotalWeight();
@@ -108,7 +117,7 @@ public class App {
         bestSol.printSolution();
     }
 
-    public static void graspBuilderMethod(Instance i, double alpha) {
+    public static void graspBuilderMethod(Instance i, boolean purge, double alpha) {
         GraspBuilder builder = new GraspBuilder(alpha);
         Solution sol = null;
         Solution bestSol = null;
@@ -117,6 +126,9 @@ public class App {
         long start = System.currentTimeMillis();
         for (int j = 0; j < 100; j++) {
             sol = builder.execute(i);
+            if(purge){
+                sol.purgeSolution();
+            }
             if (sol.getTotalWeight() < bestWeight) {
                 bestSol = sol;
                 bestWeight = bestSol.getTotalWeight();

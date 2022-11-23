@@ -51,3 +51,13 @@
     - Se genera una solución por cada uno de los algoritmos, pero luego se modifica para realizar 100 soluciones y tomar la mejor de ellas. 
     - Se itera 4 veces para comprobar resultados con valor alpha = 0.25, 0.5, 0.75 y aleatorio entre (0, 1) para cada iteración de las 100 soluciones. 
     - Posible hipótesis -> En grafos fuertemente conexos, ¿mucho mejor un alpha alto? ¿Y en poco conexos uno bajo?
+
+23 Noviembre
+    - Continuación de la creación de la purga del día anterior. 
+    - Se crea la purga en la clase Solution. Se realiza con una pila para almacenar aquellas conexiones que no se quedan
+      descubiertas para así no modificar la solución general hasta que no se compruebe que realmente se puede hacer la 
+      purga. 
+    - También se utiliza un ArrayList auxiliar de tal forma que no se tenga que hacer un remove de la lista final de 
+      nodos seleccionados -> Pasar de complejidad O(N) a complejidad O(1) para los nuevos nodos seleccionados.
+    - NOTA! SE UTILIZA UN ARRAYLIST ACTUALMENTE PARA ALMACENAR LOS NODOS SELECCIONADOS. PUEDE SER COSTOSO LA OPERACIÓN
+      ADD() EN CASO DE QUE SE TENGA QUE AMPLIAR EL ARRAY INTERNO (O(N)) -> POSIBLE MEJORA. LINKEDLIST?
