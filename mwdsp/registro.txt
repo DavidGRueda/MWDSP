@@ -61,3 +61,13 @@
       nodos seleccionados -> Pasar de complejidad O(N) a complejidad O(1) para los nuevos nodos seleccionados.
     - NOTA! SE UTILIZA UN ARRAYLIST ACTUALMENTE PARA ALMACENAR LOS NODOS SELECCIONADOS. PUEDE SER COSTOSO LA OPERACIÓN
       ADD() EN CASO DE QUE SE TENGA QUE AMPLIAR EL ARRAY INTERNO (O(N)) -> POSIBLE MEJORA. LINKEDLIST?
+
+24 Noviembre
+    - Se comienza a plantear el uso de sets para almacenar tanto los nodos dominados como los no dominados, ya que las 
+      operaciones de add() y remove() en este tipo de estructuras son O(1), al igual que el contains(), por lo que faci-
+      lita tanto el acceso para saber si un nodo se encuentra o no en la solución como añadirlo o retirarlo de la misma. 
+      Ahora mismo se tiene un array de dominio [0-1] para saber si un nodo se encuentra o no en la solucion. Modificarlo
+      evitaría el uso de dos estructuras diferentes para almacenar los nodos seleccionados.
+    - Se genera la interfaz principal de la búsqueda local y la concreta de 1xN First Improvement.
+    - Se modifica la estructura de los nodos seleccionados a Set tras comprobar sus beneficios sobre el código y facili-
+      tar el desarrollo del código de la búsqueda local. 

@@ -1,6 +1,8 @@
 package com.mwdsp;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 public class Solution {
@@ -11,8 +13,7 @@ public class Solution {
     private int totalNodes;
     private int numDomNodes;
     private int[] domNodes;
-    private int[] selectedNodes;
-    private ArrayList<Integer> selectedNodesAL; // Used later for purge. 
+    private Set<Integer> selectedNodes;
     private int[] numConnections; // Establish how many connections has each node to not dom. nodes.
 
     // Constructor
@@ -22,17 +23,17 @@ public class Solution {
         totalNodes = instance.getNodes();
         numDomNodes = 0;
         domNodes = new int[totalNodes];
-        selectedNodes = new int[totalNodes];
+        selectedNodes = new HashSet<>();
         numConnections = instance.getNumConnections();
-        selectedNodesAL = new ArrayList<>();
+        //selectedNodesAL = new ArrayList<>();
     }
 
     /**
      * Adds a node 'SN' to the solution. Follows the steps:
      *      1. Gets the connection list (the nodes connected to the SN)
-     *      2. Adds SN to the selectedNodes array
-     *      3. If it was not already dominated, it marks it as dominated and sets selectedNodeWasDominated to true, used 
-     *         to update the neighbours numConnections (greedy and GRASP builder)
+     *      2. Adds SN to the selectedNodes set
+     *      3. If it was not already dominated, adds 1 to the number of dom nodes and sets selectedNodeWasDominated to 
+     *         true, used to update the neighbours numConnections (greedy and GRASP builder)
      *      4. Adds to the total solution weight the SN weight
      * @param node that is going to be added to the solution
      */
@@ -40,8 +41,7 @@ public class Solution {
         boolean selectedNodeWasDominated = false;
         ArrayList<Integer> connections = instance.getConnectionList(node);
 
-        selectedNodes[node] = 1;
-        selectedNodesAL.add(node);
+        selectedNodes.add(node);
 
         if (domNodes[node] == 0) {
             numDomNodes++;
@@ -102,7 +102,8 @@ public class Solution {
     }
 
     public Boolean isSelected(int node) {
-        return selectedNodes[node] == 1;
+       //return selectedNodes[node] == 1;
+       return selectedNodes.contains(node);
     }
 
     public int getTotalWeight() {
@@ -111,27 +112,18 @@ public class Solution {
 
     public void printSolution() {
         System.out.println("Total Weight: " + totalWeight);
+
         System.out.println("Selected nodes: ");
-        for (int i = 0; i < selectedNodes.length; i++) {
-            if (selectedNodes[i] == 1) {
-                /*
-                 * System.out.print((i + 1) + " -> ");
-                 * for (int connection : instance.getConnectionList(i)) {
-                 * System.out.print(connection + " ");
-                 * }
-                 * System.out.println();
-                 */
-                System.out.print((i + 1) + " ");
-            }
+        for (Integer selectedNode : selectedNodes) {
+            System.out.print((selectedNode + 1) + " ");
         }
         System.out.println("\n");
 
-        System.out.println("Number of dominations: ");
-        System.out.print("[");
-        for (int i = 0; i < domNodes.length; i++) {
+        System.out.print("Number of dominations: \n[");
+        for (int i = 0; i < domNodes.length - 1; i++) {
             System.out.print(domNodes[i] + ", ");
         }
-        System.out.println("]\n\n");
+        System.out.println(domNodes[domNodes.length - 1] + "]\n");
     }
 
     /**
@@ -152,16 +144,15 @@ public class Solution {
      * nodes. Only call this method when the builder is finished.
      * @return
      */
-    public ArrayList<Integer> purgeSolution(){
-        ArrayList<Integer> purgedNodes = new ArrayList<>();
-        ArrayList<Integer> finalSelectedNodes = new ArrayList<>(); // Saves the state of final selected nodes. 
+    public void purgeSolution(){ 
+        Set <Integer> finalSelectedNodes = new HashSet<>(); // Saves the state of final selected nodes.
         ArrayList<Integer> candNodeConnections;
         Stack<Integer> nodeConnectionsCovered; // Saves the node connections that would be dominated if the CN was purged
         boolean allNodesCovered;
         int auxPointer;
         int nodeCon;
 
-        for (Integer candNode : selectedNodesAL) {
+        for (Integer candNode : selectedNodes) {
             candNodeConnections = this.instance.getConnectionList(candNode);
             candNodeConnections.add(candNode);  // Cand node should also be covered by other node if purged.
             auxPointer = 0;
@@ -183,8 +174,6 @@ public class Solution {
 
             //Purge the node if it's connections are going to be covered. Else, add it to final list.
             if(allNodesCovered){
-                purgedNodes.add(candNode);
-                selectedNodes[candNode] = 0;
                 totalWeight -= this.instance.getWeight(candNode);
 
                 for (int i = 0; i < auxPointer; i++) {
@@ -196,7 +185,6 @@ public class Solution {
             }
         }
         // Set selected nodes to all the nodes that couldn't be purged.
-        selectedNodesAL = finalSelectedNodes;
-        return purgedNodes;
+        selectedNodes = finalSelectedNodes;
     }
 }
