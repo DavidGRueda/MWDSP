@@ -3,7 +3,6 @@ package com.mwdsp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 
 public class Solution {
 
@@ -14,6 +13,7 @@ public class Solution {
     private int numDomNodes;
     private int[] domNodes;
     private Set<Integer> selectedNodes;
+    private Set<Integer> notSelectedNodes;
     private int[] numConnections; // Establish how many connections has each node to not dom. nodes.
 
     // Constructor
@@ -24,8 +24,8 @@ public class Solution {
         numDomNodes = 0;
         domNodes = new int[totalNodes];
         selectedNodes = new HashSet<>();
+        notSelectedNodes = this.instance.getAllNodesSet();
         numConnections = instance.getNumConnections();
-        //selectedNodesAL = new ArrayList<>();
     }
 
     /**
@@ -42,6 +42,7 @@ public class Solution {
         ArrayList<Integer> connections = instance.getConnectionList(node);
 
         selectedNodes.add(node);
+        notSelectedNodes.remove(node);
 
         if (domNodes[node] == 0) {
             numDomNodes++;
@@ -53,6 +54,23 @@ public class Solution {
 
         totalWeight += instance.getWeight(node);
         updateNeighbours(connections, selectedNodeWasDominated);
+    }
+
+    /**
+     * Removes a node from the solution. Only use when solution is built!
+     * @param node that needs to be removed
+     */
+    public void remove(int node){
+        ArrayList<Integer> connections = instance.getConnectionList(node);
+
+        selectedNodes.remove(node);
+        notSelectedNodes.add(node);
+        domNodes[node]--;
+        totalWeight -= instance.getWeight(node);
+
+        for (Integer con : connections) {
+            domNodes[con]--;
+        }
     }
 
     /**
@@ -119,6 +137,12 @@ public class Solution {
         }
         System.out.println("\n");
 
+        System.out.println("Not Selected nodes: ");
+        for (Integer notSelectedNode : notSelectedNodes) {
+            System.out.print((notSelectedNode + 1) + " ");
+        }
+        System.out.println("\n");
+
         System.out.print("Number of dominations: \n[");
         for (int i = 0; i < domNodes.length - 1; i++) {
             System.out.print(domNodes[i] + ", ");
@@ -142,22 +166,22 @@ public class Solution {
     /**
      * Deletes the nodes that may be added at the start of the solution and could be purged without leaving non-dominated
      * nodes. Only call this method when the builder is finished.
-     * @return
      */
     public void purgeSolution(){ 
-        Set <Integer> finalSelectedNodes = new HashSet<>(); // Saves the state of final selected nodes.
         ArrayList<Integer> candNodeConnections;
-        Stack<Integer> nodeConnectionsCovered; // Saves the node connections that would be dominated if the CN was purged
         boolean allNodesCovered;
         int auxPointer;
         int nodeCon;
 
         for (Integer candNode : selectedNodes) {
             candNodeConnections = this.instance.getConnectionList(candNode);
-            candNodeConnections.add(candNode);  // Cand node should also be covered by other node if purged.
             auxPointer = 0;
             allNodesCovered = true;
-            nodeConnectionsCovered = new Stack<>();
+
+            // Cand node should also be covered by other node if purged.
+            if((domNodes[candNode] - 1) == 0){
+                allNodesCovered = false;
+            }
 
             while(auxPointer < candNodeConnections.size() && allNodesCovered){
                 nodeCon = candNodeConnections.get(auxPointer);
@@ -165,8 +189,6 @@ public class Solution {
                 // If purging the node is going to leave the connection non dominated, do not purge the CN.
                 if((domNodes[nodeCon] - 1) == 0){
                     allNodesCovered = false;
-                } else {
-                    nodeConnectionsCovered.push(nodeCon);
                 }
                 
                 auxPointer++;
@@ -174,17 +196,70 @@ public class Solution {
 
             //Purge the node if it's connections are going to be covered. Else, add it to final list.
             if(allNodesCovered){
-                totalWeight -= this.instance.getWeight(candNode);
+                this.remove(candNode);
+            } 
+        }
+    }
 
-                for (int i = 0; i < auxPointer; i++) {
-                    domNodes[nodeConnectionsCovered.pop()]--;
-                }
+    public Set<Integer> getSelectedNodes(){
+        return this.selectedNodes;
+    }
 
-            } else {
-                finalSelectedNodes.add(candNode);
+    public Set<Integer> getNotSelectedNodes(){
+        return this.notSelectedNodes;
+    }
+
+
+    public int getNodeWeight(int node){
+        return this.instance.getWeight(node);
+    }
+
+    public Set<Integer> getNotDomNodesIfRemoved(int node){
+        Set<Integer> notDomNodesIfRemoved = new HashSet<>();
+        ArrayList<Integer> nodeConnections = this.instance.getConnectionList(node);
+
+        for (Integer connection : nodeConnections) {
+            if((domNodes[connection] - 1) == 0){
+                notDomNodesIfRemoved.add(connection);
             }
         }
-        // Set selected nodes to all the nodes that couldn't be purged.
-        selectedNodes = finalSelectedNodes;
+
+        if((domNodes[node] - 1) == 0){
+            notDomNodesIfRemoved.add(node);
+        }
+
+        return notDomNodesIfRemoved;
+    }
+
+    public void swapNodes(int nodeToRemove, Set<Integer> nodesToAdd){
+        for (Integer nodeToAdd : nodesToAdd) {
+            this.add(nodeToAdd);
+        }
+
+        this.remove(nodeToRemove);
+        System.out.println();
+    }
+
+    public Set<Integer> getNodesCovered(int node, Set<Integer> nodesToCover){
+        Set<Integer> nodesCovered = new HashSet<>();
+        ArrayList<Integer> connections = this.instance.getConnectionList(node);
+
+        for (Integer conn : connections) {
+            if(nodesToCover.contains(conn)){
+                nodesCovered.add(conn);
+            }
+        }
+
+        return nodesCovered;
+    }
+
+    public int getNodeCoverWeight(Set<Integer> localNodeCover){
+        int weight = 0;
+
+        for (Integer node : localNodeCover) {
+            weight += this.instance.getWeight(node);
+        }
+
+        return weight;
     }
 }

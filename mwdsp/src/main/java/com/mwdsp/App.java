@@ -35,12 +35,14 @@ public class App {
         for (int i = 0; i < filenames.length; i++) {
             Instance ins = new Instance(filenames[i]);
             System.out.print(filenames[i]);
-            greedyBuilderMethod(ins, true);
+            LocalSearch localSearch = new LocalSearch1xNFI();
+            greedyBuilderMethod(ins, true, localSearch);
+            //greedyBuilderMethod(ins, true, null);
         }
 
     }
 
-    public static void randomBuilderMethod(Instance i, boolean purge) {
+    public static void randomBuilderMethod(Instance i, boolean purge, LocalSearch localSearch) {
         int N_IT = 100000;
 
         RandomBuilder r = new RandomBuilder();
@@ -51,9 +53,15 @@ public class App {
         long start = System.currentTimeMillis();
         for (int j = 0; j < N_IT; j++) {
             Solution sol = r.execute(i);
+
             if(purge){
                 sol.purgeSolution();
             }
+
+            if(localSearch != null){
+                sol = localSearch.execute(sol);
+            }
+
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
                 bestSol = sol;
@@ -65,22 +73,28 @@ public class App {
         bestSol.printSolution();
     }
 
-    public static void greedyBuilderMethod(Instance i, boolean purge) {
+    public static void greedyBuilderMethod(Instance i, boolean purge, LocalSearch localSearch) {
         GreedyBuilder builder = new GreedyBuilder();
         Solution sol = null;
 
         long start = System.currentTimeMillis();
         sol = builder.execute(i);
+
         if(purge){
             sol.purgeSolution();
         }
+
+        if(localSearch != null){
+            sol = localSearch.execute(sol);
+        }
+
         long finish = System.currentTimeMillis();
 
         System.out.println("\nTime: " + (finish - start) + " ms");
         sol.printSolution();
     }
 
-    public static void graspBuilderMethod(Instance i, boolean purge) {
+    public static void graspBuilderMethod(Instance i, boolean purge, LocalSearch localSearch) {
         GraspBuilder builder;
         Solution sol;
         Solution bestSol = null;
@@ -101,9 +115,15 @@ public class App {
 
             builder = new GraspBuilder(alpha);
             sol = builder.execute(i);
+
             if(purge){
                 sol.purgeSolution();
             }
+
+            if(localSearch != null){
+                sol = localSearch.execute(sol);
+            }
+
             if (sol.getTotalWeight() < bestWeight) {
                 bestSol = sol;
                 bestWeight = bestSol.getTotalWeight();
@@ -117,7 +137,7 @@ public class App {
         bestSol.printSolution();
     }
 
-    public static void graspBuilderMethod(Instance i, boolean purge, double alpha) {
+    public static void graspBuilderMethod(Instance i, boolean purge, double alpha, LocalSearch localSearch) {
         GraspBuilder builder = new GraspBuilder(alpha);
         Solution sol = null;
         Solution bestSol = null;
@@ -129,6 +149,11 @@ public class App {
             if(purge){
                 sol.purgeSolution();
             }
+
+            if(localSearch != null){
+                sol = localSearch.execute(sol);
+            }
+
             if (sol.getTotalWeight() < bestWeight) {
                 bestSol = sol;
                 bestWeight = bestSol.getTotalWeight();
