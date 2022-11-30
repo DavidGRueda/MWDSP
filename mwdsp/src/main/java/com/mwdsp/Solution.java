@@ -3,6 +3,7 @@ package com.mwdsp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 
 public class Solution {
 
@@ -168,7 +169,9 @@ public class Solution {
      * nodes. Only call this method when the builder is finished.
      */
     public void purgeSolution(){ 
+        Set <Integer> finalSelectedNodes = new HashSet<>(); // Saves the state of final selected nodes.
         ArrayList<Integer> candNodeConnections;
+        Stack<Integer> nodeConnectionsCovered; // Saves the node connections that would be dominated if the CN was purged
         boolean allNodesCovered;
         int auxPointer;
         int nodeCon;
@@ -177,6 +180,7 @@ public class Solution {
             candNodeConnections = this.instance.getConnectionList(candNode);
             auxPointer = 0;
             allNodesCovered = true;
+            nodeConnectionsCovered = new Stack<>();
 
             // Cand node should also be covered by other node if purged.
             if((domNodes[candNode] - 1) == 0){
@@ -189,6 +193,8 @@ public class Solution {
                 // If purging the node is going to leave the connection non dominated, do not purge the CN.
                 if((domNodes[nodeCon] - 1) == 0){
                     allNodesCovered = false;
+                } else {
+                    nodeConnectionsCovered.push(nodeCon);
                 }
                 
                 auxPointer++;
@@ -196,9 +202,19 @@ public class Solution {
 
             //Purge the node if it's connections are going to be covered. Else, add it to final list.
             if(allNodesCovered){
-                this.remove(candNode);
-            } 
+                totalWeight -= this.instance.getWeight(candNode);
+                notSelectedNodes.add(candNode);
+
+                for (int i = 0; i < auxPointer; i++) {
+                    domNodes[nodeConnectionsCovered.pop()]--;
+                }
+
+            } else {
+                finalSelectedNodes.add(candNode);
+            }
         }
+        // Set selected nodes to all the nodes that couldn't be purged.
+        selectedNodes = finalSelectedNodes;
     }
 
     public Set<Integer> getSelectedNodes(){
