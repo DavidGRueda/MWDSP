@@ -12,7 +12,6 @@ public class Instance {
     private int noEdges;
     private int[] weights;
     private int[] numConnections;
-    private Set<Integer> allNodeSet;
     private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>();
 
     // Constructor & Methods
@@ -57,7 +56,13 @@ public class Instance {
     }
 
     public Set<Integer> getAllNodesSet(){
-        return this.allNodeSet;
+        Set<Integer> allNodeSet = new HashSet<>();
+
+        for (int i = 0; i < noNodes; i++) {
+            allNodeSet.add(i);
+        }
+
+        return allNodeSet;
     }
 
     public void printInstance() {
@@ -111,7 +116,6 @@ public class Instance {
                         numConnections = new int[noNodes];
                         initializeWeights(noNodes);
                         initializeAdjList(noNodes);
-                        initializeNodeSet(noNodes);
                         break;
                     case "e":
                         x = Integer.parseInt(arr[1]) - 1; // Nodes are numbered from [1, noNodes]
@@ -140,7 +144,6 @@ public class Instance {
             numConnections = new int[noNodes];
             initializeWeights(noNodes);
             initializeAdjList(noNodes);
-            initializeNodeSet(noNodes);
 
             int x, y;
             for (int i = 0; i < noEdges; i++) {
@@ -164,7 +167,6 @@ public class Instance {
             noNodes = Integer.parseInt(line);
             numConnections = new int[noNodes];
             initializeAdjList(noNodes);
-            initializeNodeSet(noNodes);
 
             line = br.readLine(); // Node positions (not used)
             for (int i = 0; i < noNodes + 1; i++) {
@@ -209,14 +211,6 @@ public class Instance {
         for (int i = 0; i < noNodes; i++) {
             ArrayList<Integer> aux = new ArrayList<Integer>();
             this.adjList.add(aux);
-        }
-    }
-
-    private void initializeNodeSet(int noNodes){
-        allNodeSet = new HashSet<>();
-
-        for (int i = 0; i < noNodes; i++) {
-            this.allNodeSet.add(i);
         }
     }
 

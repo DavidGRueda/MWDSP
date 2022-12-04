@@ -138,17 +138,17 @@ public class Solution {
         }
         System.out.println("\n");
 
-        System.out.println("Not Selected nodes: ");
-        for (Integer notSelectedNode : notSelectedNodes) {
-            System.out.print((notSelectedNode + 1) + " ");
-        }
-        System.out.println("\n");
+        // System.out.println("Not Selected nodes: ");
+        // for (Integer notSelectedNode : notSelectedNodes) {
+        //     System.out.print((notSelectedNode + 1) + " ");
+        // }
+        // System.out.println("\n");
 
-        System.out.print("Number of dominations: \n[");
-        for (int i = 0; i < domNodes.length - 1; i++) {
-            System.out.print(domNodes[i] + ", ");
-        }
-        System.out.println(domNodes[domNodes.length - 1] + "]\n");
+        // System.out.print("Number of dominations: \n[");
+        // for (int i = 0; i < domNodes.length - 1; i++) {
+        //     System.out.print(domNodes[i] + ", ");
+        // }
+        // System.out.println(domNodes[domNodes.length - 1] + "]\n");
     }
 
     /**

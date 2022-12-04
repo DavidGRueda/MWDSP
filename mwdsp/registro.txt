@@ -6,50 +6,62 @@
         - Número de nodos y de aristas. 
         - Matriz de adyacencia. 
         - Se realiza el parser para archivos .clq -> Ahora con un bucle while y un if.
-          Opción de ser modificado para ignorar los primeros comentarios y empezar a contar a partir que se encuentra "p", 
-          haciendo uso del número de aristas para cerrar el fichero. Preguntar a Jesús, aunque no es algo crítico. 
-        - Se baraja el uso de un ArrayList para la lista de adyacencia. Mejor que una LinkedList ya que, para el acceso a un determinado índice,
-          tiene una complejidad O(1), aunque la creación sea más costosa (creación no cuenta en tiempo). 
+          Opción de ser modificado para ignorar los primeros comentarios y empezar a contar a partir que se encuentra 
+          "p", haciendo uso del número de aristas para cerrar el fichero. Preguntar a Jesús, aunque no es algo crítico. 
+        - Se baraja el uso de un ArrayList para la lista de adyacencia. Mejor que una LinkedList ya que, para el acceso 
+          a un determinado índice, tiene una complejidad O(1), aunque la creación sea más costosa (creación no cuenta en
+          tiempo). 
+
 05 Octubre
     - Se termina de desarrollar la lista de adyacecncia con ArrayList. Se comprueba el funcionamiento correcto. 
-    - Se construye el parser para archivos .mtx. Se realiza una comprobación de los últimos 3 caracteres del "filename" en la creación
-      de la Instancia. 
+    - Se construye el parser para archivos .mtx. Se realiza una comprobación de los últimos 3 caracteres del "filename"
+      en la creación de la Instancia. 
     - Código encapsulado en varios submétodos fácilmente modificables para evitar código duplicado.
     - Creación de la clase "Solution".
         - Se añaden tanto arrays que contienen todos los datos de forma concreta como una forma optimizada. P.e:
-          Para el peso, se tiene un array de los nodos seleccionados y de los pesos (para no tener que acceder a la instancia una y otra vez al
-          añadir un nodo concreto), pero también un "totalWeight".
-          Para los nodos dominados, en vez de recorrer el array para saber si todos son 1, tener una variable "numDomNodes" 
+          Para el peso, se tiene un array de los nodos seleccionados y de los pesos (para no tener que acceder a la 
+          instancia una y otra vez al añadir un nodo concreto), pero también un "totalWeight".
+          Para los nodos dominados, en vez de recorrer el array para saber si todos son 1, tener una variable 
+          "numDomNodes" 
         - Al añadir un nodo, se deben de marcar aquellos nodos que se dominan al seleccionarlo y añadir el peso.
-    - Creación de la clase "RandomBuilder" -> Selecciona nodos aleatorios siempre y los añade a la solución hasta que todos estén dominados. 
+    - Creación de la clase "RandomBuilder" -> Selecciona nodos aleatorios siempre y los añade a la solución hasta que 
+      todos estén dominados. 
+
 13 Octubre
-    - Se establece que los casos de uso de DIMACS y BHOSLIB son erróneos (no coinciden con los resultados del paper). Se establece un nuevo
-      subconjunto de problemas desde la carpeta T1. 
-    - Se crea un nuevo parser por defecto que tratará estas nuevas instancias del problema (se borran las anteriores pero no sus parsers). 
+    - Se establece que los casos de uso de DIMACS y BHOSLIB son erróneos (no coinciden con los resultados del paper). 
+      Se establece un nuevo subconjunto de problemas desde la carpeta T1. 
+    - Se crea un nuevo parser por defecto que tratará estas nuevas instancias del problema (se borran las anteriores 
+      pero no sus parsers). 
     - Se crea nueva tabla de tiempos con el formato especificado en la tutoría para medir los tiempos más fácilmente. 
       https://docs.google.com/spreadsheets/d/1qn7FTewv3bSMuiCleIF9dv8TshVnmj9Zua-MkyMlK2U/edit?usp=sharing
-    - Se rellenan los diferentes datos del algoritmo RandomBuilder. Como conclusión, se aprecia que los grafos con pocos nodos y con gran 
-      número de aristas son resueltos con gran eficiencia por el RandomBuilder, pero es pésimo con respecto al resto de grafos en el cálculo
-      de la f.o.
+    - Se rellenan los diferentes datos del algoritmo RandomBuilder. Como conclusión, se aprecia que los grafos con pocos
+      nodos y con gran número de aristas son resueltos con gran eficiencia por el RandomBuilder, pero es pésimo con 
+      respecto al resto de grafos en el cálculo de la f.o.
+
 14 Octubre
     - Se comienza el desarrollo de la clase GreedyBuilder -> Constructor con algoritmo voraz. 
-    - Para evitar que entre en tiempo la creación del array con el número de conexiones que tiene cada nodo, se genera dentro de la instancia (ya que
-      no entra en tiempo), evitando así un factor O(n). Se realiza un getter luego en la creación de la solución a partir de la instancia. 
+    - Para evitar que entre en tiempo la creación del array con el número de conexiones que tiene cada nodo, se genera 
+      dentro de la instancia (ya que no entra en tiempo), evitando así un factor O(n). Se realiza un getter luego en la 
+      creación de la solución a partir de la instancia. 
     - Al crear el nuevo constructor voraz, surgen algunas preguntas. Entre ellas:
       - ¿Cómo realizar la actualización de la función objectivo del algoritmo voraz?
       - ¿Cómo reducir la complejidad de la actualización de las conexiones?
       - ¿Es óptimo recorrer bucle varias veces? -> ¿Se puede optimizar el cálculo del criterio voraz?
-    - Se crean el número de conexiones, pero deben de ser actualizadas cada vez que uno de los nodos se marque como dominado.
-    - Para que sea más rápido, en vez de actualizar las conexiones del nodo seleccionado (si no estaba dominado), se utiliza el bucle de actualización
-      de la dominación de sus vecinos para ahorrar un bucle (con una variable booleana). 
+    - Se crean el número de conexiones, pero deben de ser actualizadas cada vez que uno de los nodos se marque como 
+      dominado.
+    - Para que sea más rápido, en vez de actualizar las conexiones del nodo seleccionado (si no estaba dominado), se 
+      utiliza el bucle de actualización de la dominación de sus vecinos para ahorrar un bucle (con una variable 
+      booleana). 
 
 22 Octubre
     - Construcción de la clase GraspBuilder -> Greedy Randomized Adaptative Search Procedure. 
     - Complejidad actual del algoritmo -> O(2n), dos bucles for:
       - Uno para calcular todas las funciones objetivo de cada uno de los nodos (si no están seleccionados)
       - Otra para calcular los candidatos que pasan el filtro para luego seleccionar uno de ellos de forma aleatoria. 
-    - Se genera una solución por cada uno de los algoritmos, pero luego se modifica para realizar 100 soluciones y tomar la mejor de ellas. 
-    - Se itera 4 veces para comprobar resultados con valor alpha = 0.25, 0.5, 0.75 y aleatorio entre (0, 1) para cada iteración de las 100 soluciones. 
+    - Se genera una solución por cada uno de los algoritmos, pero luego se modifica para realizar 100 soluciones y tomar
+      la mejor de ellas. 
+    - Se itera 4 veces para comprobar resultados con valor alpha = 0.25, 0.5, 0.75 y aleatorio entre (0, 1) para cada 
+      iteración de las 100 soluciones. 
     - Posible hipótesis -> En grafos fuertemente conexos, ¿mucho mejor un alpha alto? ¿Y en poco conexos uno bajo?
 
 23 Noviembre
@@ -75,3 +87,12 @@
     - Para no tener que hacer bucles de todos los nodos y ver si estos están o no en la solución, se genera un nuevo Set
       que almacena los nodos no seleccionados en la solución. Para que la creación tampoco compute en tiempo de 
       ejecución, se genera en la instancia y luego es recuperado por el constructor de la clase Solution.
+
+04 Diciembre
+    - Se arregla el funcionamiento de la búsqueda local y de la propia solución. El principal problema fue que las
+      estructuras en Java se pasan a los métodos como referencia en memoria, y no por valor, por lo que, al modificar 
+      la estructura notSelectedNodes (con el método "remove"), se eliminaba así para la siguiente instancia, por lo que 
+      no estaban realmente los nodos no seleccionados, sino un subconjunto de ellos. 
+    - Se factoriza de nuevo la clase principal para permitir sacar tiempos totales, así como de cada una de las fases.
+      De esta forma, ahora sólo se debe modificar el método de construcción/búsqueda local y comentar el código en caso
+      de no querer ejecutar esa parte del código. 
