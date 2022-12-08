@@ -1,7 +1,9 @@
-package com.mwdsp;
+package com.mwdsp.localSearch;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import com.mwdsp.Solution;
 
 public class LocalSearch1xNFI implements LocalSearch{
     /**

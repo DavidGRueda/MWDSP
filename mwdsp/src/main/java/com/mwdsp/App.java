@@ -2,6 +2,13 @@ package com.mwdsp;
 
 import java.util.Random;
 
+import com.mwdsp.builders.GraspBuilder;
+import com.mwdsp.builders.GreedyBuilder;
+import com.mwdsp.builders.RandomBuilder;
+import com.mwdsp.localSearch.LocalSearch;
+import com.mwdsp.localSearch.LocalSearch1xNFI;
+import com.mwdsp.localSearch.LocalSearch1xNBI;
+
 public class App {
     public static void main(String[] args) {
 
@@ -39,38 +46,43 @@ public class App {
         for (int i = 0; i < filenames.length; i++) {
             totalTime = 0;
             Instance ins = new Instance(filenames[i]);
-            System.out.println(filenames[i]);
+            System.out.println("\n" + filenames[i]);
 
             // Create solution (Builder method)
             start = System.currentTimeMillis();
-            solution = graspBuilderMethod(ins, 0.25);
+
+            solution = graspBuilderMethod(ins);
+
             finish = System.currentTimeMillis();
             ellapsed = finish - start;
             totalTime += ellapsed;
             System.out.println("Builder time: " + ellapsed + " ms");
-            solution.printSolution();
 
 
             // Purge not needed nodes 
             start = System.currentTimeMillis();
+
             solution.purgeSolution();
+
             finish = System.currentTimeMillis();
             ellapsed = finish - start;
             totalTime += ellapsed;
             System.out.println("Purge time: " + ellapsed + " ms");
-            solution.printSolution();
 
             // Do the local search
             start = System.currentTimeMillis();
-            LocalSearch localSearch = new LocalSearch1xNFI();
+
+            //LocalSearch localSearch = new LocalSearch1xNFI();
+            LocalSearch localSearch = new LocalSearch1xNBI();
             solution = localSearch.execute(solution);
+
             finish = System.currentTimeMillis();
             ellapsed = finish - start;
             totalTime += ellapsed;
             System.out.println("Local search time: " + ellapsed + " ms");
-            solution.printSolution();
 
             // Final status:
+            solution.printSolution();
             System.out.println("Total time: " + totalTime + " ms");
             System.out.println("-------------------------------------------------------------------------------------");
         }

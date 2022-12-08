@@ -30,12 +30,10 @@ public class Solution {
     }
 
     /**
-     * Adds a node 'SN' to the solution. Follows the steps:
-     *      1. Gets the connection list (the nodes connected to the SN)
-     *      2. Adds SN to the selectedNodes set
-     *      3. If it was not already dominated, adds 1 to the number of dom nodes and sets selectedNodeWasDominated to 
-     *         true, used to update the neighbours numConnections (greedy and GRASP builder)
-     *      4. Adds to the total solution weight the SN weight
+     * Adds a node 'SN' to the solution. Gets the connection list (the nodes connected to the SN). Then, adds SN to the 
+     * selectedNodes set and removes it from the notSelectedNodes. If it was not already dominated, adds 1 to the number
+     * of dom nodes and sets selectedNodeWasDominated to true, used to update the neighbours numConnections. Finally, it
+     * adds to the total solution weight the SN weight.
      * @param node that is going to be added to the solution
      */
     public void add(int node) {
@@ -132,11 +130,11 @@ public class Solution {
     public void printSolution() {
         System.out.println("Total Weight: " + totalWeight);
 
-        System.out.println("Selected nodes: ");
-        for (Integer selectedNode : selectedNodes) {
-            System.out.print((selectedNode + 1) + " ");
-        }
-        System.out.println("\n");
+        // System.out.println("Selected nodes: ");
+        // for (Integer selectedNode : selectedNodes) {
+        //     System.out.print((selectedNode + 1) + " ");
+        // }
+        // System.out.println("\n");
 
         // System.out.println("Not Selected nodes: ");
         // for (Integer notSelectedNode : notSelectedNodes) {
