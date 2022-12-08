@@ -2,6 +2,13 @@ package com.mwdsp;
 
 import java.util.Random;
 
+import com.mwdsp.builders.GraspBuilder;
+import com.mwdsp.builders.GreedyBuilder;
+import com.mwdsp.builders.RandomBuilder;
+import com.mwdsp.localSearch.LocalSearch;
+import com.mwdsp.localSearch.LocalSearch1xNFI;
+import com.mwdsp.localSearch.LocalSearch1xNBI;
+
 public class App {
     public static void main(String[] args) {
 
@@ -32,15 +39,57 @@ public class App {
                 "Problem.dat_1000_1000_1",
         };
 
+        // Variables to take times
+        Solution solution = null;
+        long start, finish, ellapsed, totalTime;
+
         for (int i = 0; i < filenames.length; i++) {
+            totalTime = 0;
             Instance ins = new Instance(filenames[i]);
-            System.out.print(filenames[i]);
-            greedyBuilderMethod(ins, true);
+            System.out.println("\n" + filenames[i]);
+
+            // Create solution (Builder method)
+            start = System.currentTimeMillis();
+
+            solution = graspBuilderMethod(ins);
+
+            finish = System.currentTimeMillis();
+            ellapsed = finish - start;
+            totalTime += ellapsed;
+            System.out.println("Builder time: " + ellapsed + " ms");
+
+
+            // Purge not needed nodes 
+            start = System.currentTimeMillis();
+
+            solution.purgeSolution();
+
+            finish = System.currentTimeMillis();
+            ellapsed = finish - start;
+            totalTime += ellapsed;
+            System.out.println("Purge time: " + ellapsed + " ms");
+
+            // Do the local search
+            start = System.currentTimeMillis();
+
+            //LocalSearch localSearch = new LocalSearch1xNFI();
+            LocalSearch localSearch = new LocalSearch1xNBI();
+            solution = localSearch.execute(solution);
+
+            finish = System.currentTimeMillis();
+            ellapsed = finish - start;
+            totalTime += ellapsed;
+            System.out.println("Local search time: " + ellapsed + " ms");
+
+            // Final status:
+            solution.printSolution();
+            System.out.println("Total time: " + totalTime + " ms");
+            System.out.println("-------------------------------------------------------------------------------------");
         }
 
     }
 
-    public static void randomBuilderMethod(Instance i, boolean purge) {
+    public static Solution randomBuilderMethod(Instance i) {
         int N_IT = 100000;
 
         RandomBuilder r = new RandomBuilder();
@@ -48,95 +97,69 @@ public class App {
         double localWeight;
         Solution bestSol = null;
 
-        long start = System.currentTimeMillis();
         for (int j = 0; j < N_IT; j++) {
             Solution sol = r.execute(i);
-            if(purge){
-                sol.purgeSolution();
-            }
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
                 bestSol = sol;
             }
         }
-        long finish = System.currentTimeMillis();
 
-        System.out.println("\nTime: " + (finish - start) + " ms");
-        bestSol.printSolution();
+        return bestSol;
     }
 
-    public static void greedyBuilderMethod(Instance i, boolean purge) {
+    public static Solution greedyBuilderMethod(Instance i) {
         GreedyBuilder builder = new GreedyBuilder();
         Solution sol = null;
-
-        long start = System.currentTimeMillis();
         sol = builder.execute(i);
-        if(purge){
-            sol.purgeSolution();
-        }
-        long finish = System.currentTimeMillis();
-
-        System.out.println("\nTime: " + (finish - start) + " ms");
-        sol.printSolution();
+        return sol;
     }
 
-    public static void graspBuilderMethod(Instance i, boolean purge) {
+    public static Solution graspBuilderMethod(Instance i) {
         GraspBuilder builder;
         Solution sol;
         Solution bestSol = null;
         double bestWeight = Double.POSITIVE_INFINITY;
         double alpha;
-        double bestAlpha = -1;
 
         Random random = new Random();
         long seed = random.nextLong();
         random.setSeed(seed);
 
-        long start = System.currentTimeMillis();
         for (int j = 0; j < 100; j++) {
             alpha = random.nextDouble();
+
             // Get new alpha while alpha == 0
             while (alpha == 0.0)
                 alpha = random.nextDouble();
 
             builder = new GraspBuilder(alpha);
             sol = builder.execute(i);
-            if(purge){
-                sol.purgeSolution();
-            }
+
             if (sol.getTotalWeight() < bestWeight) {
                 bestSol = sol;
                 bestWeight = bestSol.getTotalWeight();
-                bestAlpha = alpha;
             }
         }
-        long finish = System.currentTimeMillis();
 
-        System.out.println("\nAlpha: " + bestAlpha);
-        System.out.println("\nTime: " + (finish - start) + " ms");
-        bestSol.printSolution();
+       return bestSol;
     }
 
-    public static void graspBuilderMethod(Instance i, boolean purge, double alpha) {
+    public static Solution graspBuilderMethod(Instance i, double alpha) {
         GraspBuilder builder = new GraspBuilder(alpha);
         Solution sol = null;
         Solution bestSol = null;
         double bestWeight = Double.POSITIVE_INFINITY;
 
-        long start = System.currentTimeMillis();
         for (int j = 0; j < 100; j++) {
             sol = builder.execute(i);
-            if(purge){
-                sol.purgeSolution();
-            }
+
             if (sol.getTotalWeight() < bestWeight) {
                 bestSol = sol;
                 bestWeight = bestSol.getTotalWeight();
             }
         }
-        long finish = System.currentTimeMillis();
 
-        System.out.println("\nTime: " + (finish - start) + " ms");
-        bestSol.printSolution();
+        return bestSol;
     }
 }

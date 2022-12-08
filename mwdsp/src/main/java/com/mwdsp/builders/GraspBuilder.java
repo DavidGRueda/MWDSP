@@ -1,6 +1,9 @@
-package com.mwdsp;
+package com.mwdsp.builders;
 
 import java.util.Random;
+
+import com.mwdsp.Instance;
+import com.mwdsp.Solution;
 
 public class GraspBuilder implements Builder {
     private double alpha; // alpha => [0, 1]

@@ -2,6 +2,8 @@ package com.mwdsp;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Instance {
 
@@ -10,7 +12,6 @@ public class Instance {
     private int noEdges;
     private int[] weights;
     private int[] numConnections;
-    private int[][] adjMatrix;
     private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>();
 
     // Constructor & Methods
@@ -54,6 +55,16 @@ public class Instance {
         return numConnections;
     }
 
+    public Set<Integer> getAllNodesSet(){
+        Set<Integer> allNodeSet = new HashSet<>();
+
+        for (int i = 0; i < noNodes; i++) {
+            allNodeSet.add(i);
+        }
+
+        return allNodeSet;
+    }
+
     public void printInstance() {
         // Print number of nodes and number of edges
         System.out.println("\nNumber of nodes: " + noNodes + "\nNumber of edges: " + noEdges);
@@ -64,16 +75,6 @@ public class Instance {
             System.out.print(weights[i] + ", ");
         }
         System.out.println(weights[weights.length - 1] + "]");
-
-        // Print adjacency matrix
-        // System.out.println("\nAdjacency matrix");
-        // for (int i = 0; i < adjMatrix.length; i++) {
-        // for (int j = 0; j < adjMatrix.length; j++) {
-        // System.out.print(adjMatrix[i][j]);
-        // }
-        // System.out.println();
-        // }
-
         // Print adjacency list
         System.out.println("\nAdjacency List");
         int auxCont = 1; // To know index in the arrayList.
@@ -112,7 +113,6 @@ public class Instance {
                     case "p":
                         noNodes = Integer.parseInt(arr[2]);
                         noEdges = Integer.parseInt(arr[3]);
-                        adjMatrix = new int[noNodes][noNodes];
                         numConnections = new int[noNodes];
                         initializeWeights(noNodes);
                         initializeAdjList(noNodes);
@@ -141,7 +141,6 @@ public class Instance {
             arr = line.split(" ");
             noNodes = Integer.parseInt(arr[1]);
             noEdges = Integer.parseInt(arr[2]);
-            adjMatrix = new int[noNodes][noNodes];
             numConnections = new int[noNodes];
             initializeWeights(noNodes);
             initializeAdjList(noNodes);
@@ -166,10 +165,8 @@ public class Instance {
             line = br.readLine(); // First line 'NumberOfNodes:'
             line = br.readLine();
             noNodes = Integer.parseInt(line);
-            adjMatrix = new int[noNodes][noNodes];
             numConnections = new int[noNodes];
             initializeAdjList(noNodes);
-            // initializeWeights(noNodes); -> Initialize with file weights
 
             line = br.readLine(); // Node positions (not used)
             for (int i = 0; i < noNodes + 1; i++) {
@@ -218,8 +215,6 @@ public class Instance {
     }
 
     private void addEdge(int x, int y) {
-        adjMatrix[x][y] = 1;
-        adjMatrix[y][x] = 1;
         adjList.get(x).add(y);
         adjList.get(y).add(x);
         numConnections[x]++;

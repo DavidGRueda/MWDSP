@@ -1,4 +1,7 @@
-package com.mwdsp;
+package com.mwdsp.builders;
+
+import com.mwdsp.Instance;
+import com.mwdsp.Solution;
 
 public class GreedyBuilder implements Builder {
     public Solution execute(Instance instance) {
