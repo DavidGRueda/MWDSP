@@ -96,3 +96,14 @@
     - Se factoriza de nuevo la clase principal para permitir sacar tiempos totales, así como de cada una de las fases.
       De esta forma, ahora sólo se debe modificar el método de construcción/búsqueda local y comentar el código en caso
       de no querer ejecutar esa parte del código. 
+
+21 Diciembre
+    - Después de la toma de tiempos y la nueva reunión con los tutores, se decide volver a la forma anterior de la clase
+      App. Se refactoriza de nuevo todo a cada uno de los métodos, ahora sumando los tiempos de la purga por cada it. 
+      donde es necesario (Random y GRASP) y de la búsqueda local. De esta forma, se volverán a realizar todas las tomas 
+      de tiempos donde sea necesario. 
+
+24, 25 Diciembre
+    - Error en la purga tras comprobación con método a la fuerza. Se corrigen los errores y se vuelven a tomar todos los 
+      tiempos necesarios que fueran afectados por estos cambios. 
+    - Se comienza a pensar en la implementación de la búsqueda local 2xFI y 2xBI con iteradores en vez de foreach. 

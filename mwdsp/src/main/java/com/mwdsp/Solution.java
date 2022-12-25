@@ -115,7 +115,7 @@ public class Solution {
     }
 
     public Boolean isDominated(int node) {
-        return domNodes[node] == 1;
+        return domNodes[node] >= 1;
     }
 
     public Boolean isSelected(int node) {
@@ -183,6 +183,8 @@ public class Solution {
             // Cand node should also be covered by other node if purged.
             if((domNodes[candNode] - 1) == 0){
                 allNodesCovered = false;
+            } else {
+                nodeConnectionsCovered.push(candNode);
             }
 
             while(auxPointer < candNodeConnections.size() && allNodesCovered){
@@ -203,7 +205,8 @@ public class Solution {
                 totalWeight -= this.instance.getWeight(candNode);
                 notSelectedNodes.add(candNode);
 
-                for (int i = 0; i < auxPointer; i++) {
+                int elements = nodeConnectionsCovered.size();
+                for (int i = 0; i < elements; i++) {
                     domNodes[nodeConnectionsCovered.pop()]--;
                 }
 
@@ -251,7 +254,6 @@ public class Solution {
         }
 
         this.remove(nodeToRemove);
-        System.out.println();
     }
 
     public Set<Integer> getNodesCovered(int node, Set<Integer> nodesToCover){
@@ -275,5 +277,34 @@ public class Solution {
         }
 
         return weight;
+    }
+
+    public void checkIfFeasible(){
+        int[] dominatedNodes = new int[totalNodes];
+        int totalDomNodes = 0;
+        int totalWeight = 0;
+
+        for(int sn: selectedNodes){
+            if(dominatedNodes[sn] == 0){
+                dominatedNodes[sn] = 1;
+                totalDomNodes++;
+            }
+            ArrayList<Integer> adjacent = this.instance.getConnectionList(sn);
+            for (int adj : adjacent) {
+                if(dominatedNodes[adj] == 0){
+                    dominatedNodes[adj] = 1;
+                    totalDomNodes++;
+                }
+            }
+            totalWeight += this.instance.getWeight(sn);
+        }
+
+        Set<Integer> a = new HashSet<>();
+        for (int i : dominatedNodes) {
+            a.add(i);
+        }
+        System.out.println("Are all nodes dominated? : " + (a.size() == 1));
+        System.out.println("Calc Weight: " + totalWeight + " --- Solution Weight: " + this.totalWeight );
+        System.out.println("Calc Number of Dom nodes: " + totalDomNodes + " --- Total Nodes: " + this.totalNodes);
     }
 }

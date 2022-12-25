@@ -39,87 +39,112 @@ public class App {
                 "Problem.dat_1000_1000_1",
         };
 
-        // Variables to take times
-        Solution solution = null;
-        long start, finish, ellapsed, totalTime;
+        for (String filename : filenames) {
 
-        for (int i = 0; i < filenames.length; i++) {
-            totalTime = 0;
-            Instance ins = new Instance(filenames[i]);
-            System.out.println("\n" + filenames[i]);
+            Instance ins = new Instance(filename);
+            System.out.println("\n" + filename);
 
-            // Create solution (Builder method)
-            start = System.currentTimeMillis();
-
-            solution = graspBuilderMethod(ins);
-
-            finish = System.currentTimeMillis();
-            ellapsed = finish - start;
-            totalTime += ellapsed;
-            System.out.println("Builder time: " + ellapsed + " ms");
-
-
-            // Purge not needed nodes 
-            start = System.currentTimeMillis();
-
-            solution.purgeSolution();
-
-            finish = System.currentTimeMillis();
-            ellapsed = finish - start;
-            totalTime += ellapsed;
-            System.out.println("Purge time: " + ellapsed + " ms");
-
-            // Do the local search
-            start = System.currentTimeMillis();
-
-            //LocalSearch localSearch = new LocalSearch1xNFI();
-            LocalSearch localSearch = new LocalSearch1xNBI();
-            solution = localSearch.execute(solution);
-
-            finish = System.currentTimeMillis();
-            ellapsed = finish - start;
-            totalTime += ellapsed;
-            System.out.println("Local search time: " + ellapsed + " ms");
-
-            // Final status:
-            solution.printSolution();
-            System.out.println("Total time: " + totalTime + " ms");
-            System.out.println("-------------------------------------------------------------------------------------");
+            LocalSearch ls = new LocalSearch1xNBI();
+            //randomBuilderMethod(ins, true, ls, 100);
+            //greedyBuilderMethod(ins, true, ls);
+            graspBuilderMethod(ins, true, ls);
         }
-
     }
 
-    public static Solution randomBuilderMethod(Instance i) {
-        int N_IT = 100000;
+    public static void randomBuilderMethod(Instance i, boolean purge, LocalSearch localSearch, int N_IT) {
+
+        // Variables to take times
+        Solution solution = null;
+        long start, finish, builderTime, purgeTime, localSearchTime;
+
+        builderTime = 0;
+        purgeTime = 0;
+        localSearchTime = 0;
 
         RandomBuilder r = new RandomBuilder();
         double bestWeight = Double.POSITIVE_INFINITY;
         double localWeight;
-        Solution bestSol = null;
 
         for (int j = 0; j < N_IT; j++) {
+
+            //Builder Time
+            start = System.currentTimeMillis();
             Solution sol = r.execute(i);
+            finish = System.currentTimeMillis();
+            builderTime += finish - start;
+
+            // Purge Time
+            if(purge){
+                start = System.currentTimeMillis();
+                sol.purgeSolution();
+                finish = System.currentTimeMillis();
+                purgeTime += finish - start;
+            }
+
+            // Local Search Time
+            if(localSearch != null){
+                start = System.currentTimeMillis();
+                sol = localSearch.execute(sol);
+                finish = System.currentTimeMillis();
+                localSearchTime += finish - start;
+            }
+
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
-                bestSol = sol;
+                solution = sol;
             }
         }
 
-        return bestSol;
+        printTimesAndSolution(solution, builderTime, purgeTime, localSearchTime);
     }
 
-    public static Solution greedyBuilderMethod(Instance i) {
+    public static void greedyBuilderMethod(Instance i, boolean purge, LocalSearch localSearch) {
+        long start, finish, builderTime, purgeTime, localSearchTime;
+
+        builderTime = 0;
+        purgeTime = 0;
+        localSearchTime = 0;
+
         GreedyBuilder builder = new GreedyBuilder();
-        Solution sol = null;
-        sol = builder.execute(i);
-        return sol;
+
+        //Builder Time
+        start = System.currentTimeMillis();
+        Solution solution = builder.execute(i);
+        finish = System.currentTimeMillis();
+        builderTime += finish - start;
+
+        // Purge Time
+        if(purge){
+            start = System.currentTimeMillis();
+            solution.purgeSolution();
+            finish = System.currentTimeMillis();
+            purgeTime += finish - start;
+        }
+
+        // Local Search Time
+        if(localSearch != null){
+            start = System.currentTimeMillis();
+            solution = localSearch.execute(solution);
+            finish = System.currentTimeMillis();
+            localSearchTime += finish - start;
+        }
+
+        printTimesAndSolution(solution, builderTime, purgeTime, localSearchTime);
     }
 
-    public static Solution graspBuilderMethod(Instance i) {
+    public static void graspBuilderMethod(Instance i, boolean purge, LocalSearch localSearch) {
+        Solution solution = null;
+        long start, finish, builderTime, purgeTime, localSearchTime;
+
+        builderTime = 0;
+        purgeTime = 0;
+        localSearchTime = 0;
+
+
         GraspBuilder builder;
         Solution sol;
-        Solution bestSol = null;
         double bestWeight = Double.POSITIVE_INFINITY;
+        double localWeight;
         double alpha;
 
         Random random = new Random();
@@ -133,33 +158,92 @@ public class App {
             while (alpha == 0.0)
                 alpha = random.nextDouble();
 
+            //Builder Time
+            start = System.currentTimeMillis();
             builder = new GraspBuilder(alpha);
             sol = builder.execute(i);
+            finish = System.currentTimeMillis();
+            builderTime += finish - start;
 
-            if (sol.getTotalWeight() < bestWeight) {
-                bestSol = sol;
-                bestWeight = bestSol.getTotalWeight();
+             // Purge Time
+             if(purge){
+                start = System.currentTimeMillis();
+                sol.purgeSolution();
+                finish = System.currentTimeMillis();
+                purgeTime += finish - start;
+            }
+
+            // Local Search Time
+            if(localSearch != null){
+                start = System.currentTimeMillis();
+                sol = localSearch.execute(sol);
+                finish = System.currentTimeMillis();
+                localSearchTime += finish - start;
+            }
+
+            if ((localWeight = sol.getTotalWeight()) < bestWeight) {
+                bestWeight = localWeight;
+                solution = sol;
             }
         }
 
-       return bestSol;
+        printTimesAndSolution(solution, builderTime, purgeTime, localSearchTime);
     }
 
-    public static Solution graspBuilderMethod(Instance i, double alpha) {
-        GraspBuilder builder = new GraspBuilder(alpha);
-        Solution sol = null;
-        Solution bestSol = null;
+    public static void graspBuilderMethod(Instance i, boolean purge, LocalSearch localSearch, double alpha) {
+        Solution solution = null;        
+        long start, finish, builderTime, purgeTime, localSearchTime;
+        
+        builderTime = 0;
+        purgeTime = 0;
+        localSearchTime = 0;
+        
         double bestWeight = Double.POSITIVE_INFINITY;
+        double localWeight;
+        GraspBuilder builder = new GraspBuilder(alpha);
+        Solution sol;
 
         for (int j = 0; j < 100; j++) {
-            sol = builder.execute(i);
 
-            if (sol.getTotalWeight() < bestWeight) {
-                bestSol = sol;
-                bestWeight = bestSol.getTotalWeight();
+            //Builder Time
+            start = System.currentTimeMillis();
+            builder = new GraspBuilder(alpha);
+            sol = builder.execute(i);
+            finish = System.currentTimeMillis();
+            builderTime += finish - start;
+
+            // Purge Time
+            if(purge){
+                start = System.currentTimeMillis();
+                sol.purgeSolution();
+                finish = System.currentTimeMillis();
+                purgeTime += finish - start;
+            }
+
+            // Local Search Time
+            if(localSearch != null){
+                start = System.currentTimeMillis();
+                sol = localSearch.execute(sol);
+                finish = System.currentTimeMillis();
+                localSearchTime += finish - start;
+            }
+
+            if ((localWeight = sol.getTotalWeight()) < bestWeight) {
+                bestWeight = localWeight;
+                solution = sol;
             }
         }
 
-        return bestSol;
+        printTimesAndSolution(solution, builderTime, purgeTime, localSearchTime);
+    }
+
+    private static void printTimesAndSolution(Solution solution, long builderTime, long purgeTime, long localSearchTime){
+        System.out.println("Builder time: " + builderTime + " ms");
+        System.out.println("Purge time: " + purgeTime + " ms");
+        System.out.println("LocalSearch time: " + localSearchTime + " ms");
+        System.out.println("Total time: " + (builderTime + purgeTime + localSearchTime) + " ms");
+        solution.printSolution();
+        //solution.checkIfFeasible();
+        System.out.println("-----------------------------------------------------------------------------------------");
     }
 }
