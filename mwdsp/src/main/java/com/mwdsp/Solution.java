@@ -1,7 +1,9 @@
 package com.mwdsp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -231,6 +233,16 @@ public class Solution {
         return this.instance.getWeight(node);
     }
 
+    public int getNodesWeight(Set<Integer> nodes){
+        int weight = 0;
+
+        for (Integer node : nodes) {
+            weight += this.instance.getWeight(node);
+        }
+
+        return weight;
+    }
+
     public Set<Integer> getNotDomNodesIfRemoved(int node){
         Set<Integer> notDomNodesIfRemoved = new HashSet<>();
         ArrayList<Integer> nodeConnections = this.instance.getConnectionList(node);
@@ -248,6 +260,41 @@ public class Solution {
         return notDomNodesIfRemoved;
     }
 
+    public Set<Integer> getNotDomNodesIfRemoved(Set<Integer> nodes){
+        Set<Integer> notDomNodesIfRemoved = new HashSet<>();
+        ArrayList<Integer> connections;
+
+        // If there are multiple dominations over the same node from the nodes to be removed, the structure saves how 
+        // many dominations there are to add them or not to notDomNodesIfRemoved. 
+        Map<Integer, Integer> numOfConnections = new HashMap<>();
+
+        int domsToRemove;  // How many dominations should be sub to know if they should be added to notDomNodesIfRemoved
+
+        for (Integer node : nodes) {
+            connections = this.instance.getConnectionList(node);
+
+            for (Integer conn : connections) {
+                domsToRemove = numOfConnections.getOrDefault(conn, 0) + 1;
+                
+                if((domNodes[conn] - domsToRemove) == 0){
+                    notDomNodesIfRemoved.add(conn);
+                }
+                
+                numOfConnections.put(conn, domsToRemove);
+            }
+
+            domsToRemove = numOfConnections.getOrDefault(node, 0) + 1;
+
+            if((domNodes[node] - domsToRemove) == 0){
+                notDomNodesIfRemoved.add(node);
+            }
+            
+            numOfConnections.put(node, domsToRemove);
+        }
+
+        return notDomNodesIfRemoved;
+    }
+
     public void swapNodes(int nodeToRemove, Set<Integer> nodesToAdd){
         for (Integer nodeToAdd : nodesToAdd) {
             this.add(nodeToAdd);
@@ -255,6 +302,17 @@ public class Solution {
 
         this.remove(nodeToRemove);
     }
+
+    public void swapNodes(Set<Integer> nodesToRemove, Set<Integer> nodesToAdd){
+        for (Integer nodeToAdd : nodesToAdd) {
+            this.add(nodeToAdd);
+        }
+
+        for (Integer nodeToRemove : nodesToRemove) {            
+            this.remove(nodeToRemove);
+        }
+    }
+    
 
     public Set<Integer> getNodesCovered(int node, Set<Integer> nodesToCover){
         Set<Integer> nodesCovered = new HashSet<>();

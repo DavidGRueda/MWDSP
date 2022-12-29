@@ -107,3 +107,19 @@
     - Error en la purga tras comprobación con método a la fuerza. Se corrigen los errores y se vuelven a tomar todos los 
       tiempos necesarios que fueran afectados por estos cambios. 
     - Se comienza a pensar en la implementación de la búsqueda local 2xFI y 2xBI con iteradores en vez de foreach. 
+
+26 Diciembre
+    - Creación de búsqueda local 2xNFI. Problema de varias dominaciones sobre un mismo nodo de aquellos que se fueran a
+      extraer. Si un grafo con nodos B-A-C en el que se quieren extraer B y C, no se puede comprobar de forma individual
+      los nodos que no quedan dominados, ya que sólo devolvería que B y C son los nodos a cubrir, sin contar con A. Se
+      realiza un método que, recibiendo todos los nodos a retirar, es capaz de devolver, en el caso anterior, ABC y no
+      únicamente BC. De esta forma, se crean métodos que son ampliables a "N"xNFI búsquedas locales!
+
+27-28 Diciembre
+    - Se termina la toma de tiempos com ambas búsquedas locales 2x. No son tan óptimas como las anteriormente probadas, 
+      pero sí algo más veloces a nivel de ejecución. Se comieza a barajar la posibilidad de mover el código constructivo
+      a una clase Algorithm aparte, que sea el encargado de ejecutar la construcción y devuelva una solución. 
+
+29 Diciembre
+    - Se reanaliza la construcción Greedy para así poder definir cuáles son los datos y estructuras necesarios para la 
+      implementación de la destrucción y de la construcción. Importantes los nodos dominados y el número de conexiones.

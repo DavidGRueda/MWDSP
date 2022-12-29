@@ -7,6 +7,8 @@ import com.mwdsp.builders.GreedyBuilder;
 import com.mwdsp.builders.RandomBuilder;
 import com.mwdsp.localSearch.LocalSearch;
 import com.mwdsp.localSearch.LocalSearch1xNFI;
+import com.mwdsp.localSearch.LocalSearch2XNFI;
+import com.mwdsp.localSearch.LocalSearch2xNBI;
 import com.mwdsp.localSearch.LocalSearch1xNBI;
 
 public class App {
@@ -44,7 +46,9 @@ public class App {
             Instance ins = new Instance(filename);
             System.out.println("\n" + filename);
 
-            LocalSearch ls = new LocalSearch1xNBI();
+            //LocalSearch ls = new LocalSearch2XNFI();
+            LocalSearch ls = new LocalSearch2xNBI();
+
             //randomBuilderMethod(ins, true, ls, 100);
             //greedyBuilderMethod(ins, true, ls);
             graspBuilderMethod(ins, true, ls);
