@@ -123,3 +123,9 @@
 29 Diciembre
     - Se reanaliza la construcción Greedy para así poder definir cuáles son los datos y estructuras necesarios para la 
       implementación de la destrucción y de la construcción. Importantes los nodos dominados y el número de conexiones.
+    - Implementación completa de IterativeGreedy con destrucción random y creación greedy. No se commitea porque se 
+      decide esperar a refactorizar el código completo de App para simplificar -> Clase Algorithm.
+    - Problemas con la implementación de IG, ya que las estructuras de nodos dominados y no dominados se pasan como 
+      referencia incluso con el método clone(). -> Se realiza un setNodes que crea una nueva estructura a partir de la
+      anterior para así no modificar la solución inicial si la local encontrada es mejor. 
+    - Se implementa la clase Algorithm y se comprueba su correcto funcionamiento.
