@@ -46,6 +46,14 @@ public class App {
             Algorithm alg = new Algorithm();
             Solution solution = alg.executeGreedy(ins, true, ls);
 
+            long start = System.currentTimeMillis();
+            try{
+                IterativeGreedy it = new IterativeGreedyRDGC();
+                solution = it.execute(solution, 0.5f, 10, ls);
+            } catch (CloneNotSupportedException e) {}
+            long finish = System.currentTimeMillis();
+
+            System.out.println("Iterative Greedy time: " + (finish - start) + "ms");
             solution.printSolution();
             System.out.println("-----------------------------------------------------------------------------------");
         }

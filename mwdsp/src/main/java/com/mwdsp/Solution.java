@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-public class Solution {
+public class Solution implements Cloneable{
 
     // Variables
     private Instance instance;
@@ -75,6 +75,50 @@ public class Solution {
     }
 
     /**
+     * Removes a node from the solution and updates the numConnections array. Used only for iterative greedy
+     * @param node to be removed from the solution.
+     */
+    public void removeAndUpdateConnections(int node){
+        boolean removedNodeUncovered = false;
+        ArrayList<Integer> connections = instance.getConnectionList(node);
+
+        notSelectedNodes.add(node); // Already removed from selectedNodes with iterator.remove()
+        totalWeight -= instance.getWeight(node);
+        domNodes[node]--;
+
+        // If the node gets uncovered when removed, neighbours should be updated  
+        if(domNodes[node] == 0){
+            numConnections[node]++;
+            numDomNodes--;
+            removedNodeUncovered = true; // Used to update the node connections without the need of another loop.
+        }
+
+        for (Integer con : connections) {
+            domNodes[con]--;
+
+            if(domNodes[con] == 0){
+                numDomNodes--;
+                this.updateNumConnections(con);
+            }
+
+            // +1 if the node removed was uncovered
+            if(removedNodeUncovered){
+                numConnections[con]++;
+            }
+            
+        }
+    }
+
+    public void updateNumConnections(int con){
+        ArrayList<Integer> neighbourList = instance.getConnectionList(con);
+        numConnections[con]++;
+
+        for (Integer neighbour : neighbourList) {
+            numConnections[neighbour]++;
+        }
+    }
+
+    /**
      * Updates the number of connections to non-dominated nodes each of the nodes connected to the SN has.  
      * If it was dominated, the number of connections of the neighbour must be also decreased by one. Else, just update
      * the neighbour' neighbours. 
@@ -127,6 +171,21 @@ public class Solution {
 
     public int getTotalWeight() {
         return totalWeight;
+    }
+
+    public int getTotalNodes() {
+        return totalNodes;
+    }
+
+    public void setSelectedNodes(Set<Integer> selNodes){
+        Set<Integer> aux = new HashSet<>();
+        aux.addAll(selNodes);
+        this.selectedNodes = aux;
+    }
+    public void setNotSelectedNodes(Set<Integer> nonSelNodes){
+        Set<Integer> aux = new HashSet<>();
+        aux.addAll(nonSelNodes);
+        this.notSelectedNodes = aux;
     }
 
     public void printSolution() {
@@ -364,5 +423,10 @@ public class Solution {
         System.out.println("Are all nodes dominated? : " + (a.size() == 1));
         System.out.println("Calc Weight: " + totalWeight + " --- Solution Weight: " + this.totalWeight );
         System.out.println("Calc Number of Dom nodes: " + totalDomNodes + " --- Total Nodes: " + this.totalNodes);
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
