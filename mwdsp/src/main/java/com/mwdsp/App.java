@@ -48,8 +48,8 @@ public class App {
 
             long start = System.currentTimeMillis();
             try{
-                IterativeGreedy it = new IterativeGreedyRDGC();
-                solution = it.execute(solution, 0.5f, 10, ls);
+                IterativeGreedy it = new IterativeGreedyGDGC();
+                solution = it.execute(solution, 0.3f, 10, ls, 0.25);
             } catch (CloneNotSupportedException e) {}
             long finish = System.currentTimeMillis();
 

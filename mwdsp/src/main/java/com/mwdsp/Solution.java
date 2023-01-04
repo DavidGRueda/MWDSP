@@ -18,6 +18,7 @@ public class Solution implements Cloneable{
     private Set<Integer> selectedNodes;
     private Set<Integer> notSelectedNodes;
     private int[] numConnections; // Establish how many connections has each node to not dom. nodes.
+    private int[] numConnectionsRO; // Establish how many connections has each node to not dom. nodes.
 
     // Constructor
     public Solution(Instance instance) {
@@ -29,6 +30,7 @@ public class Solution implements Cloneable{
         selectedNodes = new HashSet<>();
         notSelectedNodes = this.instance.getAllNodesSet();
         numConnections = instance.getNumConnections();
+        numConnectionsRO = instance.getNumConnectionsRO();
     }
 
     /**
@@ -154,6 +156,10 @@ public class Solution implements Cloneable{
 
     public double calculateGreedyFactor(int node) {
         return (double) (numConnections[node] + 1) / instance.getWeight(node);
+    }
+
+    public double calculateDestroyFactor(int node) {
+        return (double) (numConnectionsRO[node] + 1) / instance.getWeight(node);
     }
 
     public Boolean isFeasible() {

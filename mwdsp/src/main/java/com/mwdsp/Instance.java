@@ -12,6 +12,7 @@ public class Instance {
     private int noEdges;
     private int[] weights;
     private int[] numConnections;
+    private int[] numConnectionsRO; // Used as Read-Only. Do not modify this array!
     private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>();
 
     // Constructor & Methods
@@ -53,6 +54,10 @@ public class Instance {
 
     public int[] getNumConnections() {
         return numConnections;
+    }
+
+    public int[] getNumConnectionsRO() {
+        return numConnectionsRO;
     }
 
     public Set<Integer> getAllNodesSet(){
@@ -114,6 +119,7 @@ public class Instance {
                         noNodes = Integer.parseInt(arr[2]);
                         noEdges = Integer.parseInt(arr[3]);
                         numConnections = new int[noNodes];
+                        numConnectionsRO = new int[noNodes];
                         initializeWeights(noNodes);
                         initializeAdjList(noNodes);
                         break;
@@ -142,6 +148,7 @@ public class Instance {
             noNodes = Integer.parseInt(arr[1]);
             noEdges = Integer.parseInt(arr[2]);
             numConnections = new int[noNodes];
+            numConnectionsRO = new int[noNodes];
             initializeWeights(noNodes);
             initializeAdjList(noNodes);
 
@@ -166,6 +173,7 @@ public class Instance {
             line = br.readLine();
             noNodes = Integer.parseInt(line);
             numConnections = new int[noNodes];
+            numConnectionsRO = new int[noNodes];
             initializeAdjList(noNodes);
 
             line = br.readLine(); // Node positions (not used)
@@ -219,5 +227,7 @@ public class Instance {
         adjList.get(y).add(x);
         numConnections[x]++;
         numConnections[y]++;
+        numConnectionsRO[x]++;
+        numConnectionsRO[y]++;
     }
 }

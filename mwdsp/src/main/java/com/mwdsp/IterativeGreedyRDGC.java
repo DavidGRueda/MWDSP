@@ -7,7 +7,7 @@ import com.mwdsp.localSearch.LocalSearch;
 
 public class IterativeGreedyRDGC implements IterativeGreedy{
     
-    public Solution execute(Solution solution, float beta, int stopIterations, LocalSearch ls) throws CloneNotSupportedException{
+    public Solution execute(Solution solution, float beta, int stopIterations, LocalSearch ls, double alpha) throws CloneNotSupportedException{
         int bestWeight = solution.getTotalWeight();
         int totalNodes = solution.getTotalNodes();
         int localWeight;
