@@ -8,15 +8,15 @@ import java.util.Set;
 public class Instance {
 
     // Variables
-    private int noNodes;
-    private int noEdges;
-    private int[] weights;
-    private int[] numConnections;
-    private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>();
+    private int nodeCount;              // Total node count of the problem instance
+    private int edgeCount;              // Total edge count of the problem instance
+    private int[] weights;              // Weights of each node
+    private int[] numConnections;       // Adjacent node count of each node 
+    private int[] numConnectionsRO;     // Adjacent node count of each node (read-only)
+    private ArrayList<ArrayList<Integer>> adjList = new ArrayList<ArrayList<Integer>>(); 
 
-    // Constructor & Methods
+    // Constructor
     public Instance(String filename) {
-
         String extension = filename.substring(filename.length() - 3);
 
         try {
@@ -33,21 +33,20 @@ public class Instance {
                 default:
                     parseDefault(br);
             }
-
         } catch (Exception e) {
             System.out.println("File not found");
         }
     }
 
-    public int getNodes() {
-        return this.noNodes;
+    public int getNodeCount() {
+        return this.nodeCount;
     }
 
     public int getWeight(int node) {
         return weights[node];
     }
 
-    public ArrayList<Integer> getConnectionList(int node) {
+    public ArrayList<Integer> getAdjNodesList(int node) {
         return adjList.get(node);
     }
 
@@ -55,10 +54,14 @@ public class Instance {
         return numConnections;
     }
 
+    public int[] getNumConnectionsRO() {
+        return numConnectionsRO;
+    }
+
     public Set<Integer> getAllNodesSet(){
         Set<Integer> allNodeSet = new HashSet<>();
 
-        for (int i = 0; i < noNodes; i++) {
+        for (int i = 0; i < nodeCount; i++) {
             allNodeSet.add(i);
         }
 
@@ -66,18 +69,19 @@ public class Instance {
     }
 
     public void printInstance() {
-        // Print number of nodes and number of edges
-        System.out.println("\nNumber of nodes: " + noNodes + "\nNumber of edges: " + noEdges);
+        // Print Node & Edge Count
+        System.out.println("\nNode count: " + nodeCount + "\nEdge count: " + edgeCount);
 
-        // Print node weights
+        // Print Node Weights
         System.out.print("\nWeights: \n[");
         for (int i = 0; i < weights.length - 1; i++) {
             System.out.print(weights[i] + ", ");
         }
         System.out.println(weights[weights.length - 1] + "]");
-        // Print adjacency list
+
+        // Print Adjacency List of each node
         System.out.println("\nAdjacency List");
-        int auxCont = 1; // To know index in the arrayList.
+        int auxCont = 1; 
         for (ArrayList<Integer> arr : adjList) {
             System.out.print(auxCont + " -> ");
             for (Integer integer : arr) {
@@ -87,14 +91,18 @@ public class Instance {
             auxCont++;
         }
 
-        // Print num connections
-        System.out.print("\n Num of connections: \n[");
+        // Print Number of Connections
+        System.out.print("\n Number of connections: \n[");
         for (int i = 0; i < numConnections.length - 1; i++) {
             System.out.print(numConnections[i] + ", ");
         }
         System.out.println(numConnections[numConnections.length - 1] + "]");
     }
 
+    /**
+     * Parses a CLQ extension File.
+     * @param br - Buffered Reader created from the problem instance file. 
+     */
     private void parseCLQFile(BufferedReader br) {
         String line;
         String[] arr;
@@ -111,11 +119,12 @@ public class Instance {
                 int x, y;
                 switch (line_id) {
                     case "p":
-                        noNodes = Integer.parseInt(arr[2]);
-                        noEdges = Integer.parseInt(arr[3]);
-                        numConnections = new int[noNodes];
-                        initializeWeights(noNodes);
-                        initializeAdjList(noNodes);
+                        nodeCount = Integer.parseInt(arr[2]);
+                        edgeCount = Integer.parseInt(arr[3]);
+                        numConnections = new int[nodeCount];
+                        numConnectionsRO = new int[nodeCount];
+                        initializeWeights(nodeCount);
+                        initializeAdjList(nodeCount);
                         break;
                     case "e":
                         x = Integer.parseInt(arr[1]) - 1; // Nodes are numbered from [1, noNodes]
@@ -130,6 +139,10 @@ public class Instance {
         }
     }
 
+    /**
+     * Parses a MTX extension File.
+     * @param br - Buffered Reader created from the problem instance file. 
+     */
     private void parseMTXFile(BufferedReader br) {
         String line;
         String[] arr;
@@ -139,14 +152,15 @@ public class Instance {
             line = br.readLine(); // Second line -> Nodes and edges.
 
             arr = line.split(" ");
-            noNodes = Integer.parseInt(arr[1]);
-            noEdges = Integer.parseInt(arr[2]);
-            numConnections = new int[noNodes];
-            initializeWeights(noNodes);
-            initializeAdjList(noNodes);
+            nodeCount = Integer.parseInt(arr[1]);
+            edgeCount = Integer.parseInt(arr[2]);
+            numConnections = new int[nodeCount];
+            numConnectionsRO = new int[nodeCount];
+            initializeWeights(nodeCount);
+            initializeAdjList(nodeCount);
 
             int x, y;
-            for (int i = 0; i < noEdges; i++) {
+            for (int i = 0; i < edgeCount; i++) {
                 arr = br.readLine().split(" ");
                 x = Integer.parseInt(arr[0]) - 1; // Nodes are numbered from [1, noNodes]
                 y = Integer.parseInt(arr[1]) - 1;
@@ -158,66 +172,85 @@ public class Instance {
         }
     }
 
+    /**
+     * Parses default extension Files. Used for T1 and T2 problem instances. 
+     * @param br - Buffered Reader created from the problem instance file. 
+     */
     private void parseDefault(BufferedReader br) {
         String line;
 
         try {
             line = br.readLine(); // First line 'NumberOfNodes:'
             line = br.readLine();
-            noNodes = Integer.parseInt(line);
-            numConnections = new int[noNodes];
-            initializeAdjList(noNodes);
+            nodeCount = Integer.parseInt(line);
+            numConnections = new int[nodeCount];
+            numConnectionsRO = new int[nodeCount];
+            initializeAdjList(nodeCount);
 
             line = br.readLine(); // Node positions (not used)
-            for (int i = 0; i < noNodes + 1; i++) {
+            for (int i = 0; i < nodeCount + 1; i++) {
                 line = br.readLine();
             }
 
-            // Establish weights
-            weights = new int[noNodes];
-            for (int j = 0; j < noNodes; j++) {
+            // Establish Weights
+            weights = new int[nodeCount];
+            for (int j = 0; j < nodeCount; j++) {
                 weights[j] = Integer.parseInt(br.readLine());
             }
 
             line = br.readLine(); // Connections comment.
             String[] connections;
-            noEdges = 0;
-            for (int i = 0; i < noNodes; i++) {
+            edgeCount = 0;
+            for (int i = 0; i < nodeCount; i++) {
                 line = br.readLine();
                 connections = line.split(" ");
 
                 for (int j = 0; j < i; j++) {
                     if (Integer.parseInt(connections[j]) == 1) {
                         addEdge(i, j);
-                        noEdges++;
+                        edgeCount++;
                     }
                 }
             }
-
         } catch (Exception e) {
             System.out.println(e);
         }
     }
 
-    private void initializeWeights(int noNodes) {
-        weights = new int[noNodes];
+    /**
+     * Initialize node weights for CLQ and MTX extension files as w(i) = (i % 200) + 1.
+     * @param nodeCount - Total node count of the problem instance.
+     */
+    private void initializeWeights(int nodeCount) {
+        weights = new int[nodeCount];
 
         for (int i = 0; i < weights.length; i++) {
             weights[i] = (i % 200) + 1;
         }
     }
 
-    private void initializeAdjList(int noNodes) {
-        for (int i = 0; i < noNodes; i++) {
+    /**
+     * Initialize adjacent node list. 
+     * @param nodeCount - Total node count of the problem instance.
+     */
+    private void initializeAdjList(int nodeCount) {
+        for (int i = 0; i < nodeCount; i++) {
             ArrayList<Integer> aux = new ArrayList<Integer>();
             this.adjList.add(aux);
         }
     }
 
+    /**
+     * Adds an edge between two nodes.
+     * @param x - First node of the edge. 
+     * @param y - Second node of the edge.
+     */
     private void addEdge(int x, int y) {
         adjList.get(x).add(y);
         adjList.get(y).add(x);
         numConnections[x]++;
         numConnections[y]++;
+        numConnectionsRO[x]++;
+        numConnectionsRO[y]++;
     }
 }

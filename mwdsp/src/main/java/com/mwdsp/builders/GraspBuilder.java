@@ -13,25 +13,20 @@ public class GraspBuilder implements Builder {
     }
 
     public Solution execute(Instance instance) {
-        Solution sol = new Solution(instance);
-        int totalNodes = instance.getNodes();
+        Solution sol = new Solution(instance);        
+        int totalNodeCount = instance.getNodeCount();
 
-        double maxGreedyFactor;
-        double minGreedyFactor;
+        // Variables to create RCL and its filter
+        double maxGreedyFactor;                                   // Best greedy factor found in each iteration
+        double minGreedyFactor;                                   // Worse greedy factor found in each iteration                        
+        double greedyFactors[] = new double[totalNodeCount];      // Greedy factors for each node in each iteration
+        int[] restrictedCandidateList = new int[totalNodeCount];  // RCL to select randomly a node after filtering
 
-        double greedyFactors[] = new double[totalNodes];
-        double localGreedyFactor;
-
-        int[] randomCandidateList = new int[totalNodes];
-        int pointer; // Used to know how much elements pass the filter
-        double filter;
-        int randomNodeSelected;
-
-        // Get a random first node and add it to the solution.
+        // Get a random first node and add it to the solution
         Random random = new Random();
         long seed = random.nextLong();
         random.setSeed(seed);
-        int firstNode = random.nextInt(totalNodes);
+        int firstNode = random.nextInt(totalNodeCount);
         sol.add(firstNode);
 
         while (!sol.isFeasible()) {
@@ -39,36 +34,36 @@ public class GraspBuilder implements Builder {
             minGreedyFactor = Double.POSITIVE_INFINITY;
 
             // Calculate the greedy factor of each node if not selected. Else, factor = -1
-            for (int i = 0; i < totalNodes; i++) {
+            for (int i = 0; i < totalNodeCount; i++) {
                 if (!sol.isSelected(i)) {
-                    localGreedyFactor = sol.calculateGreedyFactor(i);
+                    double localGreedyFactor = sol.calculateGreedyFactor(i);
                     greedyFactors[i] = localGreedyFactor;
 
-                    // Update min and max greedyFactors.
+                    // Update min and max greedyFactors if necessary
                     if (localGreedyFactor < minGreedyFactor)
                         minGreedyFactor = localGreedyFactor;
+
                     if (localGreedyFactor > maxGreedyFactor)
                         maxGreedyFactor = localGreedyFactor;
-
                 } else
                     greedyFactors[i] = -1;
             }
 
             // After calculating factors, calculate μ = gmin - alpha * (gmax - gmin)
-            filter = maxGreedyFactor - alpha * (maxGreedyFactor - minGreedyFactor);
-            pointer = 0;
+            double filter = maxGreedyFactor - alpha * (maxGreedyFactor - minGreedyFactor);
+            int pointer = 0;
 
-            // Generate the random candidate list -> greedyFactor >= filter
-            for (int i = 0; i < totalNodes; i++) {
+            // Generate the Restricted Candidate List
+            for (int i = 0; i < totalNodeCount; i++) {
                 if (greedyFactors[i] >= filter) {
-                    randomCandidateList[pointer] = i;
+                    restrictedCandidateList[pointer] = i;
                     pointer++;
                 }
             }
 
-            // Pick one of the random candidate list and add it to the sol.
-            randomNodeSelected = randomCandidateList[random.nextInt(pointer)];
-            sol.add(randomNodeSelected);
+            // Pick one node randomly from the RCL and add it to the solution
+            int nodeSelected = restrictedCandidateList[random.nextInt(pointer)];
+            sol.add(nodeSelected);
         }
 
         return sol;

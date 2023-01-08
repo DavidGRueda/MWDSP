@@ -6,61 +6,56 @@ import java.util.Set;
 import com.mwdsp.Solution;
 
 public class LocalSearch1xNFI implements LocalSearch{
-    /**
-     * Tries to take out a node and substitute it for several others not selected. 
-     */
-    public Solution execute(Solution sol){
-        boolean changeDone = true; // Used to mark if a 1xN switch has been done / Loop should continue.
-        int selectedNodeWeight;   // Weight that can't be surpassed when adding new nodes
-        int addedNodesWeight; // Weight from the nodes that would be added to the solution
-        Set<Integer> selectedNodes;
-        Set<Integer> notSelectedNodes; // Passed as reference. Can't call the remove() method.
-        Set<Integer> notDomNodesIfRemoved;  // Get nodes that would not be covered if we removed one of the sel. node
-        Set<Integer> nodesToAdd;   // Nodes that would be added if the selected node was removed
+    
+    public Solution execute(Solution sol){ 
 
-        double bestFactor;    // Used to determine best notSelectedNode in each it.
-        double localFactor;
+        // Variables used to determine the best alternative nodes to the selected node in each iteration
+        int bestNode;                 // Best not selected alternative node to add in each iteration
+        int bestWeight;               // Best weight of the best alterative node in each iteration
+        double bestFactor;            // Used to determine best alternative node in each iteration
         Set<Integer> bestNodeCover;   // Best nodes that would be added if the selected node was removed
-        Set<Integer> localNodeCover;   
-        int bestWeight;                // Best weight of notSelectedNode that would be added to the solution.
-        int localWeight;      
-        int localNodeCoverWeight;
-        int bestNode;                  // Best not selected node
-        boolean realNodeSelected;   // Checks if a real 'notSelNode' was found. Else, don't add it and break.
+
+        // Variables used to check if loops should continue
+        boolean changeDone;           // Used to mark if a 1xN switch has been done / Loop should continue
+        boolean realNodeSelected;     // Checks if a real node was found as an alternative. Else, break
 
 
+        changeDone = true;
         while(changeDone){
             changeDone = false;
-            selectedNodes = sol.getSelectedNodes();
-            notSelectedNodes = sol.getNotSelectedNodes();
+            Set<Integer> selectedNodes = sol.getSelectedNodes();
+            Set<Integer> notSelectedNodes = sol.getNotSelectedNodes();
 
+            // Check if an already selected node could be substituted for another one(s) not selected.
             for (Integer node : selectedNodes) {
-                selectedNodeWeight = sol.getNodeWeight(node);
-                notDomNodesIfRemoved = sol.getNotDomNodesIfRemoved(node);
-                addedNodesWeight = 0;
-                nodesToAdd = new HashSet<>();
+                int selectedNodeWeight = sol.getNodeWeight(node);                       // Weight that can't be surpassed when adding new nodes
+                int addedNodesWeight = 0;                                               // Weight from the nodes that would be added to the solution
+                Set<Integer> nodesToAdd = new HashSet<>();                              // Nodes that would be added if the selected node was removed
+                Set<Integer> notDomNodesIfRemoved = sol.getNotDomNodesIfRemoved(node);  // Nodes that wouldn't be covered if the selected node was removed
+                
+                // While not surpassing the weight, there are nodes not covered if removed and there is a real node as
+                // the best node to add, keep adding best alternative nodes.
                 realNodeSelected = true;
-
                 while(notDomNodesIfRemoved.size() > 0 && addedNodesWeight < selectedNodeWeight && realNodeSelected){ 
                     bestFactor = Double.POSITIVE_INFINITY;                
                     bestWeight = 0;    
                     bestNode = -1;  
                     bestNodeCover = new HashSet<>();
 
+                    // Determine the best not selected alternative node for the selected node
                     for (Integer notSelNode : notSelectedNodes) {
                         if(!nodesToAdd.contains(notSelNode)){
-                            localNodeCover = sol.getNodesCovered(notSelNode, notDomNodesIfRemoved); 
-                            localWeight = sol.getNodeWeight(notSelNode);  
-                            localNodeCoverWeight = sol.getNodeCoverWeight(localNodeCover);
+                            Set<Integer> localNodeCover = sol.getNodesCoveredIfAdded(notSelNode, notDomNodesIfRemoved); 
+                            int localWeight = sol.getNodeWeight(notSelNode);  
+                            int localNodeCoverWeight = sol.getNodesWeight(localNodeCover);
 
                             // Calculate factor
-                            localFactor = Double.POSITIVE_INFINITY;
+                            double localFactor = Double.POSITIVE_INFINITY;
                             if(localNodeCoverWeight != 0){
                                 localFactor = localWeight / (double) localNodeCoverWeight;
-                            }
-                            
+                            }                            
 
-                            // Update best if needed
+                            // Update best if necessary
                             if(localFactor < bestFactor){
                                 bestFactor = localFactor;
                                 bestNodeCover = localNodeCover;
@@ -70,8 +65,9 @@ public class LocalSearch1xNFI implements LocalSearch{
                         }
                     }
 
-                    // Update the nodesToAdd, addedNodesWeight and remove nodes from notDomNodesIfRemoved
-                    // Only if one notSelectedNode is selected! Else break! Forced by adding infinite weight.
+                    // If a real node was selected, add the alternative node to the nodes that would be added if the 
+                    // selected node was removed, add its weight and remove the nodes that would be covered if the 
+                    // alternative node was added from those the selected node would leave uncovered if removed.
                     if(bestNode != -1){
                         nodesToAdd.add(bestNode);
                         addedNodesWeight += bestWeight;
@@ -84,11 +80,12 @@ public class LocalSearch1xNFI implements LocalSearch{
                     }
                 }
 
-                // If the loop breaks because a change should be done
+                // If the alternative nodes to be added are better than the selected node 'SN' (they covered all the not 
+                // dominated nodes if it was removed and their weight is better than the 'SN' weight) do the change
                 if(addedNodesWeight < selectedNodeWeight && realNodeSelected){
-                    sol.swapNodes(node, nodesToAdd);
-                    changeDone = true;
-                    break; // Restart the loop
+                    sol.swapNodes(node, nodesToAdd);  // Remove the node and add the alternative nodes
+                    changeDone = true;                // Mark that a change has been done
+                    break;                            // Restart the Local Search
                 }
             }
         }
