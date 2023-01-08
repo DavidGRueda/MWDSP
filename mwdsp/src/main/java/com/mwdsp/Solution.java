@@ -11,176 +11,61 @@ public class Solution implements Cloneable{
 
     // Variables
     private Instance instance;
-    private int totalWeight; // Try to minimize this.
-    private int totalNodes;
-    private int numDomNodes;
-    private int[] domNodes;
-    private Set<Integer> selectedNodes;
-    private Set<Integer> notSelectedNodes;
-    private int[] numConnections; // Establish how many connections has each node to not dom. nodes.
-    private int[] numConnectionsRO; // Establish how many connections has each node to not dom. nodes.
+    private int totalWeight;                // Total weight of the solution. To be minimized
+    private int totalNodeCount;             // Total node count of the problem instance
+    private int numDomNodes;                // Number of dominated nodes of the solution: [0, 1, 2... totalNodes]
+    private int[] domNodes;                 // Number of dominations over each of the nodes
+    private Set<Integer> selectedNodes;     // Selected nodes of the solution
+    private Set<Integer> notSelectedNodes;  // Not selected nodes of the solution
+    private int[] numConnections;           // Establish how many connections has each node to non-dom. nodes
+    private int[] numConnectionsRO;         // Establish how many connections has each node to non-dom. nodes (read-only)
 
     // Constructor
     public Solution(Instance instance) {
         this.instance = instance;
         totalWeight = 0;
-        totalNodes = instance.getNodes();
+        totalNodeCount = instance.getNodeCount();
         numDomNodes = 0;
-        domNodes = new int[totalNodes];
+        domNodes = new int[totalNodeCount];
         selectedNodes = new HashSet<>();
         notSelectedNodes = this.instance.getAllNodesSet();
         numConnections = instance.getNumConnections();
         numConnectionsRO = instance.getNumConnectionsRO();
     }
 
-    /**
-     * Adds a node 'SN' to the solution. Gets the connection list (the nodes connected to the SN). Then, adds SN to the 
-     * selectedNodes set and removes it from the notSelectedNodes. If it was not already dominated, adds 1 to the number
-     * of dom nodes and sets selectedNodeWasDominated to true, used to update the neighbours numConnections. Finally, it
-     * adds to the total solution weight the SN weight.
-     * @param node that is going to be added to the solution
-     */
-    public void add(int node) {
-        boolean selectedNodeWasDominated = false;
-        ArrayList<Integer> connections = instance.getConnectionList(node);
-
-        selectedNodes.add(node);
-        notSelectedNodes.remove(node);
-
-        if (domNodes[node] == 0) {
-            numDomNodes++;
-            selectedNodeWasDominated = true;
-            numConnections[node]--;
-        }
-
-        domNodes[node]++;
-
-        totalWeight += instance.getWeight(node);
-        updateNeighbours(connections, selectedNodeWasDominated);
-    }
-
-    /**
-     * Removes a node from the solution. Only use when solution is built!
-     * @param node that needs to be removed
-     */
-    public void remove(int node){
-        ArrayList<Integer> connections = instance.getConnectionList(node);
-
-        selectedNodes.remove(node);
-        notSelectedNodes.add(node);
-        domNodes[node]--;
-        totalWeight -= instance.getWeight(node);
-
-        for (Integer con : connections) {
-            domNodes[con]--;
-        }
-    }
-
-    /**
-     * Removes a node from the solution and updates the numConnections array. Used only for iterative greedy
-     * @param node to be removed from the solution.
-     */
-    public void removeAndUpdateConnections(int node){
-        boolean removedNodeUncovered = false;
-        ArrayList<Integer> connections = instance.getConnectionList(node);
-
-        notSelectedNodes.add(node); // Already removed from selectedNodes with iterator.remove()
-        totalWeight -= instance.getWeight(node);
-        domNodes[node]--;
-
-        // If the node gets uncovered when removed, neighbours should be updated  
-        if(domNodes[node] == 0){
-            numConnections[node]++;
-            numDomNodes--;
-            removedNodeUncovered = true; // Used to update the node connections without the need of another loop.
-        }
-
-        for (Integer con : connections) {
-            domNodes[con]--;
-
-            if(domNodes[con] == 0){
-                numDomNodes--;
-                this.updateNumConnections(con);
-            }
-
-            // +1 if the node removed was uncovered
-            if(removedNodeUncovered){
-                numConnections[con]++;
-            }
-            
-        }
-    }
-
-    public void updateNumConnections(int con){
-        ArrayList<Integer> neighbourList = instance.getConnectionList(con);
-        numConnections[con]++;
-
-        for (Integer neighbour : neighbourList) {
-            numConnections[neighbour]++;
-        }
-    }
-
-    /**
-     * Updates the number of connections to non-dominated nodes each of the nodes connected to the SN has.  
-     * If it was dominated, the number of connections of the neighbour must be also decreased by one. Else, just update
-     * the neighbour' neighbours. 
-     * 
-     * @param connections of the selected node that is added to the solution
-     * @param selectedNodeWasDominated true if it was not dominated before. False otherwise
-     */
-    private void updateNeighbours(ArrayList<Integer> connections, boolean selectedNodeWasDominated) {
-        if (selectedNodeWasDominated) {
-            for (Integer neighbour : connections) {
-
-                numConnections[neighbour]--;
-                
-                if (domNodes[neighbour] == 0) {
-                    numDomNodes++;
-                    updateNodeConnections(neighbour);
-                }
-
-                domNodes[neighbour]++;
-            }
-        } else {
-            for (Integer neighbour : connections) {   
-
-                if (domNodes[neighbour] == 0) {
-                    numDomNodes++;
-                    updateNodeConnections(neighbour);
-                }
-
-                domNodes[neighbour]++;
-            }
-        }
-    }
-
-    public double calculateGreedyFactor(int node) {
-        return (double) (numConnections[node] + 1) / instance.getWeight(node);
-    }
-
-    public double calculateDestroyFactor(int node) {
-        return (double) (numConnectionsRO[node] + 1) / instance.getWeight(node);
-    }
-
-    public Boolean isFeasible() {
-        return numDomNodes == totalNodes;
-    }
-
-    public Boolean isDominated(int node) {
-        return domNodes[node] >= 1;
-    }
-
-    public Boolean isSelected(int node) {
-       //return selectedNodes[node] == 1;
-       return selectedNodes.contains(node);
-    }
-
     public int getTotalWeight() {
         return totalWeight;
     }
 
-    public int getTotalNodes() {
-        return totalNodes;
+    public int getTotalNodeCount() {
+        return totalNodeCount;
+    }
+
+    public Set<Integer> getSelectedNodes(){
+        return this.selectedNodes;
+    }
+
+    public Set<Integer> getNotSelectedNodes(){
+        return this.notSelectedNodes;
+    }
+
+    public int getNodeWeight(int node){
+        return this.instance.getWeight(node);
+    }
+
+    /**
+     * Calculates the total weight of a node set.
+     * @param nodes - Nodes which total weight is going to be calculated.
+     * @return Total weight of the param nodes.
+     */
+    public int getNodesWeight(Set<Integer> nodes){
+        int weight = 0;
+
+        for (Integer node : nodes) {
+            weight += this.instance.getWeight(node);
+        }
+
+        return weight;
     }
 
     public void setSelectedNodes(Set<Integer> selNodes){
@@ -188,6 +73,7 @@ public class Solution implements Cloneable{
         aux.addAll(selNodes);
         this.selectedNodes = aux;
     }
+
     public void setNotSelectedNodes(Set<Integer> nonSelNodes){
         Set<Integer> aux = new HashSet<>();
         aux.addAll(nonSelNodes);
@@ -216,67 +102,212 @@ public class Solution implements Cloneable{
         // System.out.println(domNodes[domNodes.length - 1] + "]\n");
     }
 
+    public Boolean isFeasible() {
+        return numDomNodes == totalNodeCount;
+    }
+
+    public Boolean isDominated(int node) {
+        return domNodes[node] >= 1;
+    }
+
+    public Boolean isSelected(int node) {
+       return selectedNodes.contains(node);
+    }
+
     /**
-     * If the node wasn't dominated, this method is called to update the number of connections of non-dominated nodes 
-     * of each of the nodes connected to the param node (and the param node connections too)
-     * @param node which connections must be updated
+     * Adds a node 'SN' (Selected Node) to the solution. Adds its weight to the total weight and decreases the number of
+     * connections to non-dominated nodes of the 'SN' adjacent nodes. 
+     * @param node - Node that is going to be added to the solution. 
      */
-    private void updateNodeConnections(int node) {
-        numConnections[node]--;
-        ArrayList<Integer> connections = instance.getConnectionList(node);
-        for (Integer neighbour : connections) {
-            numConnections[neighbour]--;
+    public void add(int node) {
+        boolean addedNodeWasDominated = true;        
+
+        selectedNodes.add(node);
+        notSelectedNodes.remove(node);
+        totalWeight += instance.getWeight(node);
+
+        if (domNodes[node] == 0) {
+            numDomNodes++;
+            addedNodeWasDominated = false;
+            numConnections[node]--;
+        }
+        domNodes[node]++;
+
+        decreaseAdjNodesConnections(node, addedNodeWasDominated);
+    }
+
+    /**
+     * Decreases the number of connections to non-dominated nodes for every adjacent node of the added node. 
+     * If the adjacent node was dominated when adding the node, decreases the adj node connections too.  
+     * @param addedNode - Node that was added to the solution. 
+     * @param addedNodeWasDominated - True if the added node was dominated before adding it. False otherwise.
+     */
+    private void decreaseAdjNodesConnections(int addedNode, boolean addedNodeWasDominated) {
+        ArrayList<Integer> adjNodes = instance.getAdjNodesList(addedNode);
+
+        for (Integer adjNode : adjNodes) {
+            if(!addedNodeWasDominated)
+                numConnections[adjNode]--;
+            
+            if (domNodes[adjNode] == 0) {
+                numDomNodes++;
+                decreaseNodeConnections(adjNode);
+            }            
+            domNodes[adjNode]++;
         }
     }
 
     /**
-     * Deletes the nodes that may be added at the start of the solution and could be purged without leaving non-dominated
-     * nodes. Only call this method when the builder is finished.
+     * Decreases the number of connections to non-dominated nodes of a node and its adjacent nodes.
+     * @param node - Node which connections and adjacent node connections must be decreased.
      */
-    public void purgeSolution(){ 
-        Set <Integer> finalSelectedNodes = new HashSet<>(); // Saves the state of final selected nodes.
-        ArrayList<Integer> candNodeConnections;
-        Stack<Integer> nodeConnectionsCovered; // Saves the node connections that would be dominated if the CN was purged
-        boolean allNodesCovered;
-        int auxPointer;
-        int nodeCon;
+    private void decreaseNodeConnections(int node) {
+        ArrayList<Integer> adjNodes = instance.getAdjNodesList(node);
+
+        numConnections[node]--;
+        for (Integer adjNode : adjNodes) {
+            numConnections[adjNode]--;
+        }
+    }
+    
+    /**
+     * Removes a node 'SN' (Selected Node) from the solution. Removes its weight to the total weight. This method does 
+     * not increase the number of connections to non-dominated nodes of the 'SN' adjacent nodes. 
+     * @param node - Node that needs to be removed.
+     */
+    public void remove(int node){
+        ArrayList<Integer> adjNodes = instance.getAdjNodesList(node);
+
+        selectedNodes.remove(node);
+        notSelectedNodes.add(node);
+        domNodes[node]--;
+        totalWeight -= instance.getWeight(node);
+
+        for (Integer adjNode : adjNodes) {
+            domNodes[adjNode]--;
+        }
+    }
+
+    /**
+     * Removes a node 'SN' (Selected Node) from the solution. Removes its weight to the total weight and increases the 
+     * number of connections to non-dominated nodes of the 'SN' adjacent nodes.
+     * @param node to be removed from the solution.
+     */
+    public void removeAndUpdateConnections(int node){
+        boolean removedNodeCovered = true;
+
+        notSelectedNodes.add(node);                 // Should be removed from 'selectedNodes' outside this function.
+        totalWeight -= instance.getWeight(node);
+        domNodes[node]--;
+
+        if(domNodes[node] == 0){
+            numDomNodes--;
+            removedNodeCovered = false;
+            numConnections[node]++;
+        }
+
+        increaseAdjNodeConnections(node, removedNodeCovered);
+    }
+
+    /**
+     * Increases the number of connections to non-dominated nodes for every adjacent node of the removed node. If the 
+     * adjacent node was also uncovered when removing the node, increases the adj node connections too. 
+     * @param removedNode - Node that was removed from the solution. 
+     * @param removedNodeCovered - True if the removed node is still covered when removing it. False otherwise. 
+     */
+    private void increaseAdjNodeConnections(int removedNode, boolean removedNodeCovered){
+        ArrayList<Integer> adjNodes = instance.getAdjNodesList(removedNode);
+
+        for (Integer adjNode : adjNodes) {
+            domNodes[adjNode]--;
+
+            if(!removedNodeCovered)
+                numConnections[adjNode]++;
+
+            if(domNodes[adjNode] == 0){
+                numDomNodes--;
+                this.increaseNodeConnections(adjNode);
+            }            
+        }        
+    }
+
+    /**
+     * Increases the number of connections to non-dominated nodes of a node and its adjacent nodes.
+     * @param node - Node which connections and adjacent node connections must be increased.
+     */
+    private void increaseNodeConnections(int node){
+        ArrayList<Integer> adjNodes = instance.getAdjNodesList(node);
+        numConnections[node]++;
+
+        for (Integer adjNode : adjNodes) {
+            numConnections[adjNode]++;
+        }
+    }
+
+    /**
+     * Calculate factor to add the best node to a greedy-built solution.
+     * @param node - Node which factor needs to be calculated. 
+     * @return Calculated greedy factor of the node. 
+     */
+    public double calculateGreedyFactor(int node) {
+        return (double) (numConnections[node] + 1) / instance.getWeight(node);
+    }
+
+    /**
+     * Calculate factor to remove the worst node from a solution in a greedy way. 
+     * @param node - Node which factor needs to be calculated. 
+     * @return Calculated destroy factor of the node. 
+     */
+    public double calculateDestroyFactor(int node) {
+        return (double) (numConnectionsRO[node] + 1) / instance.getWeight(node);
+    }
+
+    /**
+     * Deletes the 'CN' (Candidate Nodes) that may be added at the start of the solution and could be purged without 
+     * leaving non-dominated nodes. This method should be only called when a solution is already built.
+     */
+    public void purgeSolution(){
+        boolean allNodesCovered;                            // True if all adjacent nodes are covered if 'CN' was purged
+        ArrayList<Integer> candNodeAdjNodes;                // Adjacent nodes of the 'CN'
+        Set <Integer> finalSelectedNodes = new HashSet<>(); // Final selected nodes
+        Stack<Integer> adjNodesCovered;                     // Adjacent nodes that would be dominated if the 'CN' was purged
 
         for (Integer candNode : selectedNodes) {
-            candNodeConnections = this.instance.getConnectionList(candNode);
-            auxPointer = 0;
+            int auxPointer = 0;
+            candNodeAdjNodes = this.instance.getAdjNodesList(candNode);
             allNodesCovered = true;
-            nodeConnectionsCovered = new Stack<>();
+            adjNodesCovered = new Stack<>();
 
-            // Cand node should also be covered by other node if purged.
+            // Cand node should also be covered by other node if purged. 
             if((domNodes[candNode] - 1) == 0){
                 allNodesCovered = false;
             } else {
-                nodeConnectionsCovered.push(candNode);
+                adjNodesCovered.push(candNode);
             }
 
-            while(auxPointer < candNodeConnections.size() && allNodesCovered){
-                nodeCon = candNodeConnections.get(auxPointer);
+            // Check if all 'CN' adjacent nodes would be covered if it was purged.
+            while(auxPointer < candNodeAdjNodes.size() && allNodesCovered){
+                int adjNode = candNodeAdjNodes.get(auxPointer);
 
-                // If purging the node is going to leave the connection non dominated, do not purge the CN.
-                if((domNodes[nodeCon] - 1) == 0){
+                // If purging the node is going to leave the adjacent node non-dominated, do not purge the CN.
+                if((domNodes[adjNode] - 1) == 0){
                     allNodesCovered = false;
                 } else {
-                    nodeConnectionsCovered.push(nodeCon);
+                    adjNodesCovered.push(adjNode);
                 }
                 
                 auxPointer++;
             }
 
-            //Purge the node if it's connections are going to be covered. Else, add it to final list.
+            // Purge the node if its adjacent nodes are going to be covered. Else, add it to final selected nodes set.
             if(allNodesCovered){
                 totalWeight -= this.instance.getWeight(candNode);
                 notSelectedNodes.add(candNode);
 
-                int elements = nodeConnectionsCovered.size();
+                int elements = adjNodesCovered.size();
                 for (int i = 0; i < elements; i++) {
-                    domNodes[nodeConnectionsCovered.pop()]--;
+                    domNodes[adjNodesCovered.pop()]--;
                 }
-
             } else {
                 finalSelectedNodes.add(candNode);
             }
@@ -285,81 +316,75 @@ public class Solution implements Cloneable{
         selectedNodes = finalSelectedNodes;
     }
 
-    public Set<Integer> getSelectedNodes(){
-        return this.selectedNodes;
-    }
-
-    public Set<Integer> getNotSelectedNodes(){
-        return this.notSelectedNodes;
-    }
-
-
-    public int getNodeWeight(int node){
-        return this.instance.getWeight(node);
-    }
-
-    public int getNodesWeight(Set<Integer> nodes){
-        int weight = 0;
-
-        for (Integer node : nodes) {
-            weight += this.instance.getWeight(node);
-        }
-
-        return weight;
-    }
-
+    /**
+     * Returns the nodes that would be uncovered if a node was removed.
+     * @param node - Node that would be removed.
+     * @return Node set containing non-dominated nodes if the node was removed.
+     */
     public Set<Integer> getNotDomNodesIfRemoved(int node){
+        ArrayList<Integer> adjNodes = this.instance.getAdjNodesList(node);
         Set<Integer> notDomNodesIfRemoved = new HashSet<>();
-        ArrayList<Integer> nodeConnections = this.instance.getConnectionList(node);
 
-        for (Integer connection : nodeConnections) {
-            if((domNodes[connection] - 1) == 0){
-                notDomNodesIfRemoved.add(connection);
-            }
-        }
-
+        // Check if the node to be removed would be uncovered.
         if((domNodes[node] - 1) == 0){
             notDomNodesIfRemoved.add(node);
+        }
+
+        // Check if the adjacent nodes would be uncovered if the node was removed.
+        for (Integer adjNode : adjNodes) {
+            if((domNodes[adjNode] - 1) == 0){
+                notDomNodesIfRemoved.add(adjNode);
+            }
         }
 
         return notDomNodesIfRemoved;
     }
 
+    /**
+     * Returns the nodes that would be uncovered if a set of nodes were removed.
+     * @param nodes - Nodes that would be removed.
+     * @return Node set containing non-dominated nodes if the nodes were removed.
+     */
     public Set<Integer> getNotDomNodesIfRemoved(Set<Integer> nodes){
         Set<Integer> notDomNodesIfRemoved = new HashSet<>();
-        ArrayList<Integer> connections;
 
         // If there are multiple dominations over the same node from the nodes to be removed, the structure saves how 
-        // many dominations there are to add them or not to notDomNodesIfRemoved. 
-        Map<Integer, Integer> numOfConnections = new HashMap<>();
-
-        int domsToRemove;  // How many dominations should be sub to know if they should be added to notDomNodesIfRemoved
+        // many dominations there are to add them or not to notDomNodesIfRemoved
+        Map<Integer, Integer> dominationsCountMap = new HashMap<>();
+        int domsToRemove;  // Dominations that should be sub to know if a node would be uncovered if nodes were removed
 
         for (Integer node : nodes) {
-            connections = this.instance.getConnectionList(node);
-
-            for (Integer conn : connections) {
-                domsToRemove = numOfConnections.getOrDefault(conn, 0) + 1;
-                
-                if((domNodes[conn] - domsToRemove) == 0){
-                    notDomNodesIfRemoved.add(conn);
-                }
-                
-                numOfConnections.put(conn, domsToRemove);
-            }
-
-            domsToRemove = numOfConnections.getOrDefault(node, 0) + 1;
+            // Check if the removed node would be uncovered
+            domsToRemove = dominationsCountMap.getOrDefault(node, 0) + 1;
 
             if((domNodes[node] - domsToRemove) == 0){
                 notDomNodesIfRemoved.add(node);
             }
             
-            numOfConnections.put(node, domsToRemove);
+            dominationsCountMap.put(node, domsToRemove);
+
+            // Check if the adjacent nodes would be uncovered if the nodes were removed
+            ArrayList<Integer> adjNodes = this.instance.getAdjNodesList(node);
+            for (Integer adjNode : adjNodes) {
+                domsToRemove = dominationsCountMap.getOrDefault(adjNode, 0) + 1;
+                
+                if((domNodes[adjNode] - domsToRemove) == 0){
+                    notDomNodesIfRemoved.add(adjNode);
+                }
+                
+                dominationsCountMap.put(adjNode, domsToRemove);
+            }
+
         }
 
         return notDomNodesIfRemoved;
     }
 
+    /**
+     * Removes one node and adds a set of nodes
+     * @param nodeToRemove - Node to be removed.
+     * @param nodesToAdd - Nodes to be added.
+     */
     public void swapNodes(int nodeToRemove, Set<Integer> nodesToAdd){
         for (Integer nodeToAdd : nodesToAdd) {
             this.add(nodeToAdd);
@@ -368,6 +393,11 @@ public class Solution implements Cloneable{
         this.remove(nodeToRemove);
     }
 
+    /**
+     * Removes a set of nodes and adds a set of nodes
+     * @param nodesToRemove - Nodes to be removed.
+     * @param nodesToAdd - Nodes to be added.
+     */
     public void swapNodes(Set<Integer> nodesToRemove, Set<Integer> nodesToAdd){
         for (Integer nodeToAdd : nodesToAdd) {
             this.add(nodeToAdd);
@@ -378,32 +408,30 @@ public class Solution implements Cloneable{
         }
     }
     
-
-    public Set<Integer> getNodesCovered(int node, Set<Integer> nodesToCover){
+    /**
+     * Returns the nodes that would be covered (from a node set) if a node was added to the solution.
+     * @param node - Node that would be added.
+     * @param nodesToCover - Nodes that should be covered.
+     * @return Node set containing the nodes from nodesToCover that would be covered if the node was added.
+     */
+    public Set<Integer> getNodesCoveredIfAdded(int node, Set<Integer> nodesToCover){
         Set<Integer> nodesCovered = new HashSet<>();
-        ArrayList<Integer> connections = this.instance.getConnectionList(node);
+        ArrayList<Integer> adjNodes = this.instance.getAdjNodesList(node);
 
-        for (Integer conn : connections) {
-            if(nodesToCover.contains(conn)){
-                nodesCovered.add(conn);
+        for (Integer adjNode : adjNodes) {
+            if(nodesToCover.contains(adjNode)){
+                nodesCovered.add(adjNode);
             }
         }
 
         return nodesCovered;
     }
 
-    public int getNodeCoverWeight(Set<Integer> localNodeCover){
-        int weight = 0;
-
-        for (Integer node : localNodeCover) {
-            weight += this.instance.getWeight(node);
-        }
-
-        return weight;
-    }
-
+    /**
+     * Checks if a solution is feasible and well-built.
+     */
     public void checkIfFeasible(){
-        int[] dominatedNodes = new int[totalNodes];
+        int[] dominatedNodes = new int[totalNodeCount];
         int totalDomNodes = 0;
         int totalWeight = 0;
 
@@ -412,10 +440,11 @@ public class Solution implements Cloneable{
                 dominatedNodes[sn] = 1;
                 totalDomNodes++;
             }
-            ArrayList<Integer> adjacent = this.instance.getConnectionList(sn);
-            for (int adj : adjacent) {
-                if(dominatedNodes[adj] == 0){
-                    dominatedNodes[adj] = 1;
+
+            ArrayList<Integer> adjNodes = this.instance.getAdjNodesList(sn);
+            for (int adjNode : adjNodes) {
+                if(dominatedNodes[adjNode] == 0){
+                    dominatedNodes[adjNode] = 1;
                     totalDomNodes++;
                 }
             }
@@ -428,7 +457,7 @@ public class Solution implements Cloneable{
         }
         System.out.println("Are all nodes dominated? : " + (a.size() == 1));
         System.out.println("Calc Weight: " + totalWeight + " --- Solution Weight: " + this.totalWeight );
-        System.out.println("Calc Number of Dom nodes: " + totalDomNodes + " --- Total Nodes: " + this.totalNodes);
+        System.out.println("Calc Number of Dom nodes: " + totalDomNodes + " --- Total Nodes: " + this.totalNodeCount);
     }
 
     @Override

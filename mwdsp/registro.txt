@@ -129,3 +129,9 @@
       referencia incluso con el método clone(). -> Se realiza un setNodes que crea una nueva estructura a partir de la
       anterior para así no modificar la solución inicial si la local encontrada es mejor. 
     - Se implementa la clase Algorithm y se comprueba su correcto funcionamiento.
+
+1-6 Enero
+    - Se finaliza la creación de IterativeGreedy con destrucción greedy y creación GRASP. 
+    - Se comprueba la correcta funcionalidad. 
+    - Se refactoriza a la clase Algorithm ambos métodos. 
+    - Se refactoriza y se hace cleanup de código + se comenta todo el código para que sea legible y entendible. 

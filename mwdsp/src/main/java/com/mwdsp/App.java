@@ -2,9 +2,9 @@ package com.mwdsp;
 
 import com.mwdsp.localSearch.LocalSearch;
 import com.mwdsp.localSearch.LocalSearch1xNFI;
+import com.mwdsp.localSearch.LocalSearch1xNBI;
 import com.mwdsp.localSearch.LocalSearch2XNFI;
 import com.mwdsp.localSearch.LocalSearch2xNBI;
-import com.mwdsp.localSearch.LocalSearch1xNBI;
 
 public class App {
     public static void main(String[] args) {
@@ -38,22 +38,21 @@ public class App {
 
         for (String filename : filenames) {
 
+            // Create Instance
             Instance ins = new Instance(filename);
             System.out.println("\n" + filename);
 
+            // Create Local search
             LocalSearch ls = new LocalSearch1xNFI();
 
+            // Execute Algorithm
             Algorithm alg = new Algorithm();
             Solution solution = alg.executeGreedy(ins, true, ls);
 
-            long start = System.currentTimeMillis();
-            try{
-                IterativeGreedy it = new IterativeGreedyGDGC();
-                solution = it.execute(solution, 0.3f, 10, ls, 0.25);
-            } catch (CloneNotSupportedException e) {}
-            long finish = System.currentTimeMillis();
+            // Execute Iterative Greedy
+            solution = alg.executeIterativeGreedyGDGC(solution, 0.3f, 10, ls, 0.25);
 
-            System.out.println("Iterative Greedy time: " + (finish - start) + "ms");
+            // Print Solution
             solution.printSolution();
             System.out.println("-----------------------------------------------------------------------------------");
         }
