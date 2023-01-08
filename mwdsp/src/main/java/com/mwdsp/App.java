@@ -42,7 +42,7 @@ public class App {
             Instance ins = new Instance(filename);
             System.out.println("\n" + filename);
 
-            // Create Local search
+            // Create Local Search
             LocalSearch ls = new LocalSearch1xNFI();
 
             // Execute Algorithm

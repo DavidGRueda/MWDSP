@@ -173,7 +173,7 @@ public class Instance {
     }
 
     /**
-     * Parses a TXT extension File. Used for T1 and T2 problem instances. 
+     * Parses default extension Files. Used for T1 and T2 problem instances. 
      * @param br - Buffered Reader created from the problem instance file. 
      */
     private void parseDefault(BufferedReader br) {
