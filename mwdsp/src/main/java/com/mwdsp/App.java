@@ -47,7 +47,8 @@ public class App {
 
             // Execute Algorithm
             Algorithm alg = new Algorithm();
-            Solution solution = alg.executeGreedy(ins, true, ls);
+            //Solution solution = alg.executeGreedy(ins, true, ls);
+            Solution solution = alg.executeGraspParallelized(ins, true, ls, 0.25);
 
             // Execute Iterative Greedy
             solution = alg.executeIterativeGreedyGDGC(solution, 0.3f, 10, ls, 0.25);

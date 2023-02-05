@@ -1,6 +1,7 @@
 package com.mwdsp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class Solution implements Cloneable{
         domNodes = new int[totalNodeCount];
         selectedNodes = new HashSet<>();
         notSelectedNodes = this.instance.getAllNodesSet();
-        numConnections = instance.getNumConnections();
+        numConnections = Arrays.copyOf(instance.getNumConnections(), totalNodeCount);
         numConnectionsRO = instance.getNumConnectionsRO();
     }
 
