@@ -1,14 +1,21 @@
 package com.mwdsp;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.mwdsp.builders.GraspBuilder;
 import com.mwdsp.builders.GreedyBuilder;
 import com.mwdsp.builders.RandomBuilder;
+import com.mwdsp.callables.GraspCallable;
 import com.mwdsp.iterativeGreedy.IterativeGreedy;
 import com.mwdsp.iterativeGreedy.IterativeGreedyGDGC;
 import com.mwdsp.iterativeGreedy.IterativeGreedyRDGC;
@@ -311,6 +318,60 @@ public class Algorithm {
         return solution;
     }
 
+    /**
+     * Executes and returns a parallelized GRASP built solution with a defined alpha from a problem instance.
+     * @param i - Instance of the problem.
+     * @param purge - True if the solution should be purged. False otherwise. 
+     * @param localSearch - LocalSearch that should be executed. Null if no local search is desired.
+     * @param alpha - Defines the restrictiveness of the RCL (Restricted Candidate List) when adding a new node. 
+     *                Domain: [0.0 - 1.0]
+     * @return Solution - Built solution.
+     */
+    public Solution executeGraspParallelized(Instance i, boolean purge, LocalSearch localSearch, double alpha) {
+        // Solution to be returned. Best one found 
+        Solution solution = null;        
+
+        // Variables used to take times
+        long start, finish, builderTime, purgeTime, localSearchTime;        
+        builderTime = 0;
+        purgeTime = 0;
+        localSearchTime = 0;
+        
+        // Variables used to update best solution if needed
+        double bestWeight = Double.POSITIVE_INFINITY;
+        double localWeight;
+
+        // Create thread pool and Future lists that will hold results
+        ExecutorService executor = Executors.newFixedThreadPool(100);
+        List<Future<Solution>> fList = new ArrayList<Future<Solution>>();
+
+        // Create callable
+        Callable<Solution> callable = new GraspCallable(i, purge, localSearch, alpha);
+
+        // Add GRASP task to each thread
+        start = System.currentTimeMillis();
+        for (int j = 0; j < 100; j++) {
+            Future<Solution> future = executor.submit(callable);
+            fList.add(future);
+        }
+
+        // Retrieve all results. 
+        for (Future<Solution> fut : fList) {
+            try {
+                Solution sol = fut.get();
+                if((localWeight = sol.getTotalWeight()) < bestWeight){
+                    solution = sol;
+                    bestWeight = localWeight;
+                }
+            } catch (Exception e) {}
+        }        
+        finish = System.currentTimeMillis();
+        builderTime += finish - start;
+        executor.close();
+
+        printBuilderTimes(builderTime, purgeTime, localSearchTime);
+        return solution;
+    }
     /**
      * Executes a Random Destroy Greedy Construction Iterative Greedy algorithm and returns best solution found.
      * @param solution - Previously built solution.
