@@ -8,6 +8,7 @@ import java.util.Set;
 public class Instance {
 
     // Variables
+    private String filename;            // Stores the filename of the instance
     private int nodeCount;              // Total node count of the problem instance
     private int edgeCount;              // Total edge count of the problem instance
     private int[] weights;              // Weights of each node
@@ -17,6 +18,7 @@ public class Instance {
 
     // Constructor
     public Instance(String filename) {
+        this.filename = filename;
         String extension = filename.substring(filename.length() - 3);
 
         try {
@@ -38,6 +40,10 @@ public class Instance {
         }
     }
 
+    public String getFilename(){
+        return this.filename;
+    }
+
     public int getNodeCount() {
         return this.nodeCount;
     }
@@ -51,7 +57,7 @@ public class Instance {
     }
 
     public int[] getNumConnections() {
-        return numConnections;
+        return numConnections.clone();
     }
 
     public int[] getNumConnectionsRO() {

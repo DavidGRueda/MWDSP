@@ -1,5 +1,9 @@
 package com.mwdsp;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 import com.mwdsp.builders.GraspBuilder;
@@ -36,6 +40,10 @@ public class Algorithm {
 
         RandomBuilder r = new RandomBuilder();
 
+        //Create and open a file to store all Random builder step results
+        BufferedWriter wr = createNewFile(i.getFilename());
+        String line = "Random builder:\n\n";
+
         // Execute the random builder, purge and do local search (if required), and update best solution found if needed
         for (int j = 0; j < N_IT; j++) {
 
@@ -44,6 +52,7 @@ public class Algorithm {
             Solution sol = r.execute(i);
             finish = System.currentTimeMillis();
             builderTime += finish - start;
+            line += sol.getTotalWeight() + " - ";
 
             // Purge stage
             if(purge){
@@ -51,6 +60,7 @@ public class Algorithm {
                 sol.purgeSolution();
                 finish = System.currentTimeMillis();
                 purgeTime += finish - start;
+                line += sol.getTotalWeight() + " - ";
             }
 
             // Local Search stage
@@ -59,14 +69,23 @@ public class Algorithm {
                 sol = localSearch.execute(sol);
                 finish = System.currentTimeMillis();
                 localSearchTime += finish - start;
+                line += sol.getTotalWeight() + " - ";
             }
 
             // Update solution stage
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
                 solution = sol;
+                line += "UPDATED";
             }
+            line += "\n";
         }
+
+        // Write all the results in the corresponding file
+        try {
+            wr.write(line);
+            wr.close();
+        } catch (IOException e) {}
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
         return solution;
@@ -88,11 +107,16 @@ public class Algorithm {
 
         GreedyBuilder builder = new GreedyBuilder();
 
+        //Create and open a file to store Greedy step results
+        BufferedWriter wr = createNewFile(i.getFilename());
+        String line = "Greedy builder:\n\n";
+
         // Builder stage
         start = System.currentTimeMillis();
         Solution solution = builder.execute(i);
         finish = System.currentTimeMillis();
         builderTime += finish - start;
+        line += solution.getTotalWeight() + " - ";
 
         // Purge stage
         if(purge){
@@ -100,6 +124,7 @@ public class Algorithm {
             solution.purgeSolution();
             finish = System.currentTimeMillis();
             purgeTime += finish - start;
+            line += solution.getTotalWeight() + " - ";
         }
 
         // Local Search stage
@@ -108,7 +133,14 @@ public class Algorithm {
             solution = localSearch.execute(solution);
             finish = System.currentTimeMillis();
             localSearchTime += finish - start;
+            line += solution.getTotalWeight();
         }
+
+        // Write all the results in the corresponding file
+        try {
+            wr.write(line);
+            wr.close();
+        } catch (IOException e) {}
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
         return solution;
@@ -144,6 +176,10 @@ public class Algorithm {
         long seed = random.nextLong();
         random.setSeed(seed);
 
+        //Create and open a file to store all Random GRASP step results
+        BufferedWriter wr = createNewFile(i.getFilename());
+        String line = "GRASP with RANDOM alpha\n\n";
+
         // Execute the GRASP builder, purge and do local search (if required), and update best solution found if needed 
         for (int j = 0; j < 100; j++) {
             alpha = random.nextDouble();
@@ -151,6 +187,7 @@ public class Algorithm {
             // Get new alpha while alpha == 0
             while (alpha == 0.0)
                 alpha = random.nextDouble();
+            line += String.format("%.2f", alpha) + " -> ";
 
             // Builder stage
             start = System.currentTimeMillis();
@@ -158,6 +195,7 @@ public class Algorithm {
             Solution sol = builder.execute(i);
             finish = System.currentTimeMillis();
             builderTime += finish - start;
+            line += sol.getTotalWeight() + " - ";
 
              // Purge stage
              if(purge){
@@ -165,6 +203,7 @@ public class Algorithm {
                 sol.purgeSolution();
                 finish = System.currentTimeMillis();
                 purgeTime += finish - start;
+                line += sol.getTotalWeight() + " - ";
             }
 
             // Local Search stage
@@ -173,14 +212,23 @@ public class Algorithm {
                 sol = localSearch.execute(sol);
                 finish = System.currentTimeMillis();
                 localSearchTime += finish - start;
+                line += sol.getTotalWeight() + " - ";
             }
 
             // Update solution stage
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
                 solution = sol;
+                line += "UPDATED";
             }
+            line += "\n";
         }
+
+        // Write all the results in the corresponding file
+        try {
+            wr.write(line);
+            wr.close();
+        } catch (IOException e) {}
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
         return solution;
@@ -211,15 +259,20 @@ public class Algorithm {
 
         GraspBuilder builder = new GraspBuilder(alpha);
 
+        //Create and open a file to store all GRASP step results
+        BufferedWriter wr = createNewFile(i.getFilename());
+        String line = "GRASP with alpha " + alpha + "\n\n";
+
         // Execute the GRASP builder, purge and do local search (if required), and update best solution found if needed
         for (int j = 0; j < 100; j++) {
-
+            
             //Builder stage
             start = System.currentTimeMillis();
             builder = new GraspBuilder(alpha);
             Solution sol = builder.execute(i);
             finish = System.currentTimeMillis();
             builderTime += finish - start;
+            line += sol.getTotalWeight() + " - ";
 
             // Purge stage
             if(purge){
@@ -227,6 +280,7 @@ public class Algorithm {
                 sol.purgeSolution();
                 finish = System.currentTimeMillis();
                 purgeTime += finish - start;
+                line += sol.getTotalWeight() + " - ";
             }
 
             // Local Search stage
@@ -235,15 +289,24 @@ public class Algorithm {
                 sol = localSearch.execute(sol);
                 finish = System.currentTimeMillis();
                 localSearchTime += finish - start;
+                line += sol.getTotalWeight() + " - ";
             }
 
             // Update solution stage
             if ((localWeight = sol.getTotalWeight()) < bestWeight) {
                 bestWeight = localWeight;
                 solution = sol;
-            }
+                line += "UPDATED";
+            }            
+            line += "\n";
         }
 
+        // Write all the results in the corresponding file
+        try {
+            wr.write(line);
+            wr.close();
+        } catch (IOException e) {}
+       
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
         return solution;
     }
@@ -301,5 +364,27 @@ public class Algorithm {
         System.out.println("Purge time: " + purgeTime + " ms");
         System.out.println("LocalSearch time: " + localSearchTime + " ms");
         System.out.println("Total build time: " + (builderTime + purgeTime + localSearchTime) + " ms");        
+    }
+
+    /**
+     * Creates a new file and returns a writer for that file.
+     * @param filename - Name of the file.
+     * @return BufferedWriter - Writer for the file
+     */
+    private BufferedWriter createNewFile(String filename){
+        // Deletes the previous file and creates a new one
+        String filepath = System.getProperty("user.dir") + "/mwdsp/src/logs/" + filename + ".txt";
+        File fold = new File(filepath);
+        fold.delete();
+        File fnew = new File(filepath);
+
+        try{
+            return new BufferedWriter(
+                new FileWriter(fnew, false)
+            );
+        } catch(IOException exception){
+            System.out.println(exception);
+            return null;
+        }
     }
 }
