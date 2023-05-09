@@ -1,7 +1,6 @@
 package com.mwdsp.builders;
 
-import java.util.Random;
-
+import com.mwdsp.CustomRandom;
 import com.mwdsp.Instance;
 import com.mwdsp.Solution;
 
@@ -23,10 +22,7 @@ public class GraspBuilder implements Builder {
         int[] restrictedCandidateList = new int[totalNodeCount];  // RCL to select randomly a node after filtering
 
         // Get a random first node and add it to the solution
-        Random random = new Random();
-        long seed = random.nextLong();
-        random.setSeed(seed);
-        int firstNode = random.nextInt(totalNodeCount);
+        int firstNode = CustomRandom.nextInt(totalNodeCount);
         sol.add(firstNode);
 
         while (!sol.isFeasible()) {
@@ -62,7 +58,7 @@ public class GraspBuilder implements Builder {
             }
 
             // Pick one node randomly from the RCL and add it to the solution
-            int nodeSelected = restrictedCandidateList[random.nextInt(pointer)];
+            int nodeSelected = restrictedCandidateList[CustomRandom.nextInt(pointer)];
             sol.add(nodeSelected);
         }
 

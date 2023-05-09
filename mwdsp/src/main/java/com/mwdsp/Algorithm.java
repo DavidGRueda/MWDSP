@@ -6,7 +6,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -178,10 +177,6 @@ public class Algorithm {
         GraspBuilder builder;
         double alpha;
 
-        // Variables to generate a randomized alpha
-        Random random = new Random();
-        long seed = random.nextLong();
-        random.setSeed(seed);
 
         //Create and open a file to store all Random GRASP step results
         BufferedWriter wr = createNewFile(i.getFilename());
@@ -189,11 +184,11 @@ public class Algorithm {
 
         // Execute the GRASP builder, purge and do local search (if required), and update best solution found if needed 
         for (int j = 0; j < 100; j++) {
-            alpha = random.nextDouble();
+            alpha = CustomRandom.nextDouble();
 
             // Get new alpha while alpha == 0
             while (alpha == 0.0)
-                alpha = random.nextDouble();
+                alpha = CustomRandom.nextDouble();
             line += String.format("%.2f", alpha) + " -> ";
 
             // Builder stage

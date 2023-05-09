@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.mwdsp.Solution;
 
-public class LocalSearch2XNFI implements LocalSearch{
+public class LocalSearch2xNFI implements LocalSearch{
     
     public Solution execute(Solution sol){
         

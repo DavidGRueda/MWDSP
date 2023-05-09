@@ -3,7 +3,7 @@ package com.mwdsp;
 import com.mwdsp.localSearch.LocalSearch;
 import com.mwdsp.localSearch.LocalSearch1xNFI;
 import com.mwdsp.localSearch.LocalSearch1xNBI;
-import com.mwdsp.localSearch.LocalSearch2XNFI;
+import com.mwdsp.localSearch.LocalSearch2xNFI;
 import com.mwdsp.localSearch.LocalSearch2xNBI;
 
 public class App {
@@ -37,6 +37,8 @@ public class App {
         };
 
         for (String filename : filenames) {
+            // Initialize the CustomRandom class
+            CustomRandom.init();
 
             // Create Instance
             Instance ins = new Instance(filename);

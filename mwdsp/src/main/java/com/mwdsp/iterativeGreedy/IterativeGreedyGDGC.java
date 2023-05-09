@@ -1,8 +1,8 @@
 package com.mwdsp.iterativeGreedy;
 
-import java.util.Random;
 import java.util.Set;
 
+import com.mwdsp.CustomRandom;
 import com.mwdsp.Solution;
 import com.mwdsp.localSearch.LocalSearch;
 
@@ -53,10 +53,6 @@ public class IterativeGreedyGDGC implements IterativeGreedy{
             double minGreedyFactor;                                   // Worse greedy factor found in each iteration
             double greedyFactors[] = new double[totalNodeCount];      // Greedy factors for each node in each iteration
             int[] restrictedCandidateList = new int[totalNodeCount];  // RCL to select randomly a node after filtering
-            
-            Random random = new Random();
-            long seed = random.nextLong();
-            random.setSeed(seed);
 
             while (!sol.isFeasible()) {
                 maxGreedyFactor = Double.NEGATIVE_INFINITY;
@@ -91,7 +87,7 @@ public class IterativeGreedyGDGC implements IterativeGreedy{
                 }
 
                 // Pick one node randomly from the RCL and add it to the solution
-                int nodeSelected = restrictedCandidateList[random.nextInt(pointer)];
+                int nodeSelected = restrictedCandidateList[CustomRandom.nextInt(pointer)];
                 sol.add(nodeSelected);
             }
 
