@@ -135,3 +135,11 @@
     - Se comprueba la correcta funcionalidad. 
     - Se refactoriza a la clase Algorithm ambos métodos. 
     - Se refactoriza y se hace cleanup de código + se comenta todo el código para que sea legible y entendible. 
+
+Ultimos pasos: 
+  - Creación de los logs en los diferentes constructivos para saber exactamente los pasos ejecutados. 
+  - Creación de una clase pseudorandomizada para evitar diferentes resultados en diferentes ejecuciones debido a la
+    semilla. (CustomRandom).
+  - Actualización de la clase Solution para almacenar el tiempo total de ejecución y así poder imprimirlo en un
+    fichero de resultados. 
+  - Creación de ficheros de constantes para almacenar datos fijos del código. 

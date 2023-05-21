@@ -94,6 +94,7 @@ public class Algorithm {
         } catch (IOException e) {}
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
+        solution.addToExecutionTime(builderTime + purgeTime + localSearchTime);
         return solution;
     }
 
@@ -149,6 +150,7 @@ public class Algorithm {
         } catch (IOException e) {}
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
+        solution.addToExecutionTime(builderTime + purgeTime + localSearchTime);
         return solution;
     }
 
@@ -233,6 +235,7 @@ public class Algorithm {
         } catch (IOException e) {}
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
+        solution.addToExecutionTime(builderTime + purgeTime + localSearchTime);
         return solution;
     }
 
@@ -310,6 +313,7 @@ public class Algorithm {
         } catch (IOException e) {}
        
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
+        solution.addToExecutionTime(builderTime + purgeTime + localSearchTime);
         return solution;
     }
 
@@ -365,6 +369,7 @@ public class Algorithm {
         executor.close();
 
         printBuilderTimes(builderTime, purgeTime, localSearchTime);
+        solution.addToExecutionTime(builderTime + purgeTime + localSearchTime);
         return solution;
     }
     /**
@@ -384,6 +389,7 @@ public class Algorithm {
         long finish = System.currentTimeMillis();
 
         System.out.println("Iterative Greedy time: " + (finish - start) + "ms");
+        solution.addToExecutionTime(finish - start);
         return solution;
     }
 
@@ -406,6 +412,7 @@ public class Algorithm {
         long finish = System.currentTimeMillis();
 
         System.out.println("Iterative Greedy time: " + (finish - start) + "ms");
+        solution.addToExecutionTime(finish - start);
         return solution;
     }
 
@@ -427,7 +434,7 @@ public class Algorithm {
      * @param filename - Name of the file.
      * @return BufferedWriter - Writer for the file
      */
-    private BufferedWriter createNewFile(String filename){
+    public BufferedWriter createNewFile(String filename){
         // Deletes the previous file and creates a new one
         String filepath = System.getProperty("user.dir") + "/mwdsp/src/logs/" + filename + ".txt";
         File fold = new File(filepath);

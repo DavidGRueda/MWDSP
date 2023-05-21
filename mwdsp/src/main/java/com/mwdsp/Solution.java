@@ -19,6 +19,7 @@ public class Solution implements Cloneable{
     private Set<Integer> notSelectedNodes;  // Not selected nodes of the solution
     private int[] numConnections;           // Establish how many connections has each node to non-dom. nodes
     private int[] numConnectionsRO;         // Establish how many connections has each node to non-dom. nodes (read-only)
+    private long executionTime;             // Total time of execution (used to print results in output files)
 
     // Constructor
     public Solution(Instance instance) {
@@ -31,6 +32,7 @@ public class Solution implements Cloneable{
         notSelectedNodes = this.instance.getAllNodesSet();
         numConnections = instance.getNumConnections();
         numConnectionsRO = instance.getNumConnectionsRO();
+        executionTime = 0;
     }
 
     public int getTotalWeight() {
@@ -53,6 +55,10 @@ public class Solution implements Cloneable{
         return this.instance.getWeight(node);
     }
 
+    public void addToExecutionTime(long time){
+        this.executionTime += time;
+    }
+
     /**
      * Calculates the total weight of a node set.
      * @param nodes - Nodes which total weight is going to be calculated.
@@ -66,6 +72,15 @@ public class Solution implements Cloneable{
         }
 
         return weight;
+    }
+
+    /**
+     * Returns the main information about the solution of the problem divided by commas
+     * @param filename - Name of the problem being resolved
+     * @return String with the final calculated solution - Filename,Weight,ExecTime
+     */
+    public String getSolutionString(String filename){
+        return filename + "," + this.totalWeight + "," + (this.executionTime / 1000f) + "\n";
     }
 
     public void setSelectedNodes(Set<Integer> selNodes){

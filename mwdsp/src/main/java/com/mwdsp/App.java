@@ -1,5 +1,8 @@
 package com.mwdsp;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import com.mwdsp.localSearch.LocalSearch;
 import com.mwdsp.localSearch.LocalSearch1xNFI;
 import com.mwdsp.localSearch.LocalSearch1xNBI;
@@ -8,35 +11,11 @@ import com.mwdsp.localSearch.LocalSearch2xNBI;
 
 public class App {
     public static void main(String[] args) {
+        Algorithm alg = new Algorithm();
+        BufferedWriter wr = alg.createNewFile(Constants.RESULTS_FILENAME);
+        String results = "RESULTS\n";
 
-        String[] filenames = {
-                "Problem.dat_50_50_0",
-                "Problem.dat_50_50_1",
-                "Problem.dat_50_100_0",
-                "Problem.dat_50_100_1",
-                "Problem.dat_50_250_0",
-                "Problem.dat_50_250_1",
-                "Problem.dat_50_1000_0",
-                "Problem.dat_50_1000_1",
-                "Problem.dat_100_100_0",
-                "Problem.dat_100_100_1",
-                "Problem.dat_100_250_0",
-                "Problem.dat_100_250_1",
-                "Problem.dat_100_500_0",
-                "Problem.dat_100_500_1",
-                "Problem.dat_100_750_0",
-                "Problem.dat_100_750_1",
-                "Problem.dat_250_750_0",
-                "Problem.dat_250_750_1",
-                "Problem.dat_250_1000_0",
-                "Problem.dat_250_1000_1",
-                "Problem.dat_300_300_0",
-                "Problem.dat_300_300_1",
-                "Problem.dat_1000_1000_0",
-                "Problem.dat_1000_1000_1",
-        };
-
-        for (String filename : filenames) {
+        for (String filename : Constants.T1_ALL_FILENAMES) {
             // Initialize the CustomRandom class
             CustomRandom.init();
 
@@ -45,19 +24,24 @@ public class App {
             System.out.println("\n" + filename);
 
             // Create Local Search
-            LocalSearch ls = new LocalSearch1xNFI();
+            LocalSearch ls = new LocalSearch1xNBI();
 
-            // Execute Algorithm
-            Algorithm alg = new Algorithm();
-            //Solution solution = alg.executeGreedy(ins, true, ls);
-            Solution solution = alg.executeGraspParallelized(ins, true, ls, 0.25);
+            // Execute Algorithm            
+            Solution solution = alg.executeGrasp(ins, true, ls, 0.25);
 
             // Execute Iterative Greedy
-            solution = alg.executeIterativeGreedyGDGC(solution, 0.3f, 10, ls, 0.25);
+            solution = alg.executeIterativeGreedyGDGC(solution, 0.4f, 40, ls, 0.25);
 
-            // Print Solution
+            // Print Solution and save it in the results file
             solution.printSolution();
             System.out.println("-----------------------------------------------------------------------------------");
+            results += solution.getSolutionString(filename);
         }
+
+        // Write all the results in the output file
+        try {
+            wr.write(results);
+            wr.close();
+        } catch (IOException e) {}
     }
 }
